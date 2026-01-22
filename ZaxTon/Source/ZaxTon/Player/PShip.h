@@ -20,6 +20,30 @@ class ZAXTON_API APShip : public APawn
 
 	class UCapsuleComponent* Collision{ nullptr };
 
+	// funzioni gestione movimento
+	void  MoveForward(float Input);
+
+	void  MoveRight(float Input);
+
+	void  FireBullet();         // inizio fuoco
+	void  FireBulletRelease();  // fine fuoco
+
+	// variabili in cui memorizzare gli input
+	// e renderli visibili in altre funzioni
+	float left { 0 };
+	float front{ 0 };
+
+	float Vel{ 900.f }; // velocità della nave
+
+	// vera se il fuco è attivo
+	bool  bFireOn{ false };
+	float FireRate{8.f}; // fire rte ovver oil numero di colpi al secondo 
+
+	float FireTime{ 0.f }; // variabile counter , in sostituzione di un eventuale timer di unreal
+
+	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
+	// mi serve un handle per poter spegnere il timer al momento del rilascio
+
 public:
 	// Sets default values for this pawn's properties
 	APShip();
@@ -31,6 +55,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void SpawnBullet();
+
+	void ManageMove(float DeltaTime);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

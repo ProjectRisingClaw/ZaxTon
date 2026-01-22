@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PCamera.h"
+#include "PBullet.h"
 
 // Sets default values
-APCamera::APCamera()
+APBullet::APBullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	SetRootComponent(Body);
 
-
 	//memorizzo in una variabile il path dell'asset
-	auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Modules/SM_Parts_StarSparrow_Thruster.SM_Parts_StarSparrow_Thruster'");
+	auto Path = TEXT("StaticMesh'/Engine/VREditor/TransformGizmo/SM_Sequencer_Node.SM_Sequencer_Node'");
 
 	// per sicurezza (ad esempio aver dato un path sbagliato) controllo con un cast
 	// che il puntatore restituito sia effettivamente a StaticMesh
@@ -25,30 +25,25 @@ APCamera::APCamera()
 	if (MyMesh)
 	{
 		Body->SetStaticMesh(MyMesh);
-		// l'oggetto è soltanto il mio punto
-		// di vista non deve essere visibile
-		Body->SetHiddenInGame(true);
+		Body->SetRelativeScale3D(FVector(3));
 	}
 
 
 }
 
 // Called when the game starts or when spawned
-void APCamera::BeginPlay()
+void APBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
-
-
-
-
+	SetLifeSpan(1.5f); // dopo 1.5 secondi viene rimosso
 }
 
 // Called every frame
-void APCamera::Tick(float DeltaTime)
+void APBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	// prosegue diritto di fronte a se
+	SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 
 }
 
