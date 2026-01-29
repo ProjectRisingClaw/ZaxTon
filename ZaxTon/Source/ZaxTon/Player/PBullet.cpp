@@ -2,6 +2,7 @@
 
 
 #include "PBullet.h"
+#include "PShip.h" // altrimenti non posso utilizzare variabili e funzioni di questa classe
 
 // Sets default values
 APBullet::APBullet()
@@ -49,6 +50,7 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation)
 
 
 
+
 void APBullet::DeActivate()
 {
 	// disattivo collisione proiettile 
@@ -59,6 +61,17 @@ void APBullet::DeActivate()
 	Body->SetHiddenInGame(true);
 	// posiziono l'ogggetto in una zona lontana da quella di azione
 	SetActorLocation(FVector(0, 0, -10000));
+
+
+
+	// mi inserisco tra i disponibili
+	auto MyShip{ Cast<APShip>(GetOwner()) }; // controllo che Owner sia di tipo APShip
+	if (MyShip)
+	{
+		MyShip->InUse.Remove(this); // remove toglie un elemento da un array, se lo trova
+		MyShip->Available.AddUnique(this);
+	}
+	// se sto tra quelli in uso, mi rimuovo dalla lista
 }
 
 // Called when the game starts or when spawned

@@ -91,8 +91,11 @@ void APShip::BeginPlay()
 	{
 		// creo istanza
 		auto bull{ GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass()) };
+		bull->SetOwner(this); // come creo il proiettile
+		// gli lascio un riferimento all'oggetto che lo ha creato
 		bull->DeActivate(); // disattivo istanza
-		Available.AddUnique(bull); // inserisco in array dei disponibili.
+	
+		//Available.AddUnique(bull); // inserisco in array dei disponibili.
 	}
 	
 
@@ -161,8 +164,9 @@ void APShip::SpawnBullet()
 		NewBull->Activate(SpawnLocation, GetActorRotation()); // attivo oggetto posizionandolo
 		// nella locazione desiderata
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+	
+	
 	}
-
 
 }
 
@@ -202,8 +206,6 @@ void  APShip::MoveForward(float Input)
 
 void  APShip::MoveRight(float Input)
 { 
-	left = Input; 
-
-	
+	left = Input; 	
 }
 

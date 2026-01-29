@@ -46,16 +46,13 @@ class ZAXTON_API APShip : public APawn
 
 	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
 	// mi serve un handle per poter spegnere il timer al momento del rilascio
-
+public:
+	// Sets default values for this pawn's properties
+	APShip();
 
 	// gestione di pool per spawn proiettili
 	TArray<APBullet*> Available; // proiettili disponibili
 	TArray<APBullet*> InUse;     //proiettili correntemente in uso
-
-
-public:
-	// Sets default values for this pawn's properties
-	APShip();
 
 protected:
 	// Called when the game starts or when spawned
