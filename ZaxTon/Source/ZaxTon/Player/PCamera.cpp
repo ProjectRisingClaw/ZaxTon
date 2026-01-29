@@ -38,10 +38,6 @@ void APCamera::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
-
-
-
 
 }
 

@@ -6,6 +6,9 @@
 #include "GameFramework/Pawn.h"
 #include "PShip.generated.h"
 
+
+class APBullet; // forward declaration per bullet, dato che lo includo solo nel cpp
+
 UCLASS()
 class ZAXTON_API APShip : public APawn
 {
@@ -25,8 +28,8 @@ class ZAXTON_API APShip : public APawn
 
 	void  MoveRight(float Input);
 
-	void  FireBullet();         // inizio fuoco
-	void  FireBulletRelease();  // fine fuoco
+	FORCEINLINE void  FireBullet()        { bFireOn = true; };  // inizio fuoco
+	FORCEINLINE void  FireBulletRelease() { bFireOn = false; }; // fine fuoco
 
 	// variabili in cui memorizzare gli input
 	// e renderli visibili in altre funzioni
@@ -44,6 +47,12 @@ class ZAXTON_API APShip : public APawn
 	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
 	// mi serve un handle per poter spegnere il timer al momento del rilascio
 
+
+	// gestione di pool per spawn proiettili
+	TArray<APBullet*> Available; // proiettili disponibili
+	TArray<APBullet*> InUse;     //proiettili correntemente in uso
+
+
 public:
 	// Sets default values for this pawn's properties
 	APShip();
@@ -55,6 +64,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void ManageFire(float DeltaTime);
 
 	void SpawnBullet();
 

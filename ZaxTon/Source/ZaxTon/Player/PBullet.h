@@ -13,12 +13,23 @@ class ZAXTON_API APBullet : public AActor
 	
 
 	UStaticMeshComponent* Body{ nullptr };
-
 	float Vel{ 3500.f };
 
 public:	
 	// Sets default values for this actor's properties
 	APBullet();
+
+	// tempo prima di disattivarsi
+	float Durata{ 1.5f };
+
+	// attiva grafica e fisica del proiettile
+	// da richiamare qunado estratto dalla pool
+	void Activate(FVector SpawnLocation,FRotator SpawnRotation);
+
+	// disattiva grafica e fisica del proiettile
+	// quando ri messo da parte nella pool
+	void DeActivate();
+
 
 protected:
 	// Called when the game starts or when spawned

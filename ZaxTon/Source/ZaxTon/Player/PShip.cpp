@@ -53,21 +53,29 @@ APShip::APShip()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
 
-	//memorizzo in una variabile il path dell'asset
-	auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01.SM_StarSparrow01'");
-	
+	//auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01.SM_StarSparrow01'"); // funziona ugualmente ma non più necessario
+	auto Path = TEXT("/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01");
+	//auto Path = TEXT("SM_StarSparrow01");
+	// 
 	// per sicurezza (ad esempio aver dato un path sbagliato) controllo con un cast
 	// che il puntatore restituito sia effettivamente a StaticMesh
-	auto MyMesh = Cast<UStaticMesh> ( StaticLoadObject(UStaticMesh::StaticClass(),  // tipo dell'oggetto da trovare
-		                              nullptr,                                  // riferimeto ad oggetto se serve
-		                              Path) );                                    // path dell'asset
-	
+
+
+	auto MyMesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),  // tipo dell'oggetto da trovare
+		nullptr,                                  // riferimeto ad oggetto se serve
+		Path));
+
+	                               // path dell'asset
 	if (MyMesh)
 	{
 		Collision->SetCapsuleSize(64,32);
 		Collision->SetHiddenInGame(false); 
 		Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT(" no mesh "));
 	}
 
 }
@@ -76,6 +84,16 @@ APShip::APShip()
 void APShip::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// inizializzo il mio array "pool"
+	// creao 15 proiettili e li inserisco tra quelli disponibili per essere sparati
+	for (int i = 0; i < 15; i++)
+	{
+		// creo istanza
+		auto bull{ GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass()) };
+		bull->DeActivate(); // disattivo istanza
+		Available.AddUnique(bull); // inserisco in array dei disponibili.
+	}
 	
 
 	FireRate = 1 / FireRate;
@@ -91,15 +109,13 @@ void APShip::BeginPlay()
 		{
 			// devo passare la visuale dal giocatore a questo oggetto
 			auto MyController{ Cast<APlayerController>(GetController()) };
-			MyController->SetViewTargetWithBlend(MyCamera,1.5f);
+			MyController->SetViewTargetWithBlend(MyCamera, 1.f);
 			// primo argomento, oggetto a cui voglio passare la visuale
 			// secondo argomento, in quanto tempo
-
 			return;
 		}
-
 	}
-
+	
 }
 
 // Called every frame
@@ -108,7 +124,12 @@ void APShip::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	ManageMove(DeltaTime);
+	ManageFire(DeltaTime);
 
+}
+
+void APShip::ManageFire(float DeltaTime)
+{
 	if (bFireOn)
 	{
 		// FireTime parte da 0 e quando raggiunge il valore di fire rat, rilascio un proiettile e lo azzero nuovamente
@@ -120,8 +141,6 @@ void APShip::Tick(float DeltaTime)
 		}
 
 	}
-
-
 }
 
 void APShip::SpawnBullet()
@@ -131,7 +150,20 @@ void APShip::SpawnBullet()
 	// in questo caso UClass si crea con Nomeclass::StaticClass()
 	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 }; // trovo posizione spawn
 	//classe  // riferimento uclass    // locazione   // rotazione di spawn
-	GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass(), SpawnLocation, GetActorRotation());
+	//GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass(), SpawnLocation, GetActorRotation());
+
+	// per eseguire spawn dalla pool controllo che ci siano elementi disponibili e 
+	// nel caso li attivo posizionandoli nella locazione giusta
+
+	if (Available.Num() > 0) // se c'è almeno un elemento
+	{
+		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
+		NewBull->Activate(SpawnLocation, GetActorRotation()); // attivo oggetto posizionandolo
+		// nella locazione desiderata
+		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+	}
+
+
 }
 
 void APShip::ManageMove(float DeltaTime)
@@ -163,21 +195,15 @@ void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 // nelle funzioni input semplicemente memorizzo l'ultimo valore
 void  APShip::MoveForward(float Input)
-{ front = Input;}
+{
+	front = Input;
+}
+	
 
 void  APShip::MoveRight(float Input)
-{ left = Input; }
+{ 
+	left = Input; 
 
-void APShip::FireBullet()
-{
-
-	bFireOn = true;             // handle   // utilizzatore // funzione // tempo // loop si no
-	//GetWorldTimerManager().SetTimer(FireHandle, this, &APShip::SpawnBullet, FireRate, true);
 	
 }
 
-void APShip::FireBulletRelease()
-{
-	bFireOn = false;
-	//GetWorldTimerManager().ClearTimer(FireHandle); // disattivo il timer al rilascio
-}

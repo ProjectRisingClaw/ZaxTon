@@ -31,11 +31,41 @@ APBullet::APBullet()
 
 }
 
+// 
+void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation)
+{
+	// disattivo collisione proiettile 
+	Body->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// disattivo il tick
+	PrimaryActorTick.bCanEverTick = true;
+	// nascondo grafica del proiettile
+	Body->SetHiddenInGame(false);
+	// posiziono l'ogggetto in una zona lontana da quella di azione
+	SetActorLocation(SpawnLocation);
+	SetActorRotation(SpawnRotation);
+	Durata = 1.5; // ripristino durata proiettile
+
+}
+
+
+
+void APBullet::DeActivate()
+{
+	// disattivo collisione proiettile 
+	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// disattivo il tick
+	PrimaryActorTick.bCanEverTick = false;
+	// nascondo grafica del proiettile
+	Body->SetHiddenInGame(true);
+	// posiziono l'ogggetto in una zona lontana da quella di azione
+	SetActorLocation(FVector(0, 0, -10000));
+}
+
 // Called when the game starts or when spawned
 void APBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	SetLifeSpan(1.5f); // dopo 1.5 secondi viene rimosso
+	//SetLifeSpan(1.5f); // dopo 1.5 secondi viene rimosso
 }
 
 // Called every frame
@@ -43,7 +73,12 @@ void APBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	// prosegue diritto di fronte a se
-	SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+	if (Durata > 0)
+	{
+		Durata -= DeltaTime;
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+	}
+	else DeActivate();
 
 }
 
