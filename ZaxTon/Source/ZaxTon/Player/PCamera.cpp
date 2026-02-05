@@ -46,5 +46,10 @@ void APCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//SetActorLocation(GetActorLocation() + FVector(100, 0, 0) * DeltaTime);
+	SetActorLocation(GetActorLocation() + GetActorUpVector() * Vel * DeltaTime);
+
+	//SetActorLocation(GetActorLocation() + GetActorForwardVector() * 50 * DeltaTime);
+	//SetActorLocation(GetActorLocation() + GetActorRightVector() * Vel * DeltaTime);
 }
 

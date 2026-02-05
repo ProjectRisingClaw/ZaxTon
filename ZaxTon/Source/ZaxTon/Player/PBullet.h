@@ -18,7 +18,7 @@ class ZAXTON_API APBullet : public AActor
 public:	
 	// Sets default values for this actor's properties
 	APBullet();
-
+	//~APBullet();
 	// tempo prima di disattivarsi
 	float Durata{ 1.5f };
 

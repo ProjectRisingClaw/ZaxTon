@@ -36,7 +36,16 @@ class ZAXTON_API APShip : public APawn
 	float left { 0 };
 	float front{ 0 };
 
-	float Vel{ 900.f }; // velocità della nave
+
+	UPROPERTY(EditAnyWhere)
+	float Vel{ 1200.f }; // velocità della nave
+
+
+	UPROPERTY(EditAnyWhere) // limite di distanza DX SX con la camera 
+	float XLimit{ 1200.f };
+
+	UPROPERTY(EditAnyWhere) // limite di distanza avanti indietro dalla camera 
+	float YLimit{ 700.f };
 
 	// vera se il fuco è attivo
 	bool  bFireOn{ false };
@@ -53,6 +62,14 @@ public:
 	// gestione di pool per spawn proiettili
 	TArray<APBullet*> Available; // proiettili disponibili
 	TArray<APBullet*> InUse;     //proiettili correntemente in uso
+
+	// vettore che determina lo scarto tra la posizione della nave e l'actor usato
+	//vome camera. Se l'offset è 0 0 0 significa che la nave è nella stessa posizione della camera
+	FVector CamOffset{ 0,0,0 };
+
+	// puntatore per memorizzare riferimento all'oggetto usato
+	//come punto di vista 
+	class APCamera* MyCamera;
 
 protected:
 	// Called when the game starts or when spawned

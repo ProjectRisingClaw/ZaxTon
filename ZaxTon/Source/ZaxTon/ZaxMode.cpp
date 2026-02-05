@@ -3,3 +3,11 @@
 
 #include "ZaxMode.h"
 
+void AZaxMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+
+
+}

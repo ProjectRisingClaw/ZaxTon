@@ -14,6 +14,9 @@ class ZAXTON_API APCamera : public AActor
 
 	UStaticMeshComponent* Body{ nullptr };
 
+	UPROPERTY(EditAnyWhere)
+	float Vel{ 100.f };
+
 public:	
 	// Sets default values for this actor's properties
 	APCamera();

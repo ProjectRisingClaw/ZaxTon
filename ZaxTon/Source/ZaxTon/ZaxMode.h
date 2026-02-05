@@ -14,4 +14,10 @@ class ZAXTON_API AZaxMode : public AGameMode
 {
 	GENERATED_BODY()
 	
+public:
+
+	virtual void BeginPlay() override;
+	
+
+
 };

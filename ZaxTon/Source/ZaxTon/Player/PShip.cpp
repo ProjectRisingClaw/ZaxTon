@@ -98,7 +98,8 @@ void APShip::BeginPlay()
 		//Available.AddUnique(bull); // inserisco in array dei disponibili.
 	}
 	
-
+	// il fire rate messo come vaolre iniziale si intende in 
+	// proiettil ial secondo. qui lo ricaloclolo come 1/ numero di proiettili
 	FireRate = 1 / FireRate;
 
 	// Arg1: inizializzo un array di puntatori con lista di oggetti del tipo desiderato 
@@ -106,7 +107,7 @@ void APShip::BeginPlay()
 	// Arg3: incremento passo all'elemento successivo dell'array
 	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
 	{
-		auto MyCamera = *CamList;
+		MyCamera = *CamList;
 
 		if (MyCamera) // il primo oggetto pcam della lista, va bene dato che ne metto solo uno
 		{
@@ -115,6 +116,14 @@ void APShip::BeginPlay()
 			MyController->SetViewTargetWithBlend(MyCamera, 1.f);
 			// primo argomento, oggetto a cui voglio passare la visuale
 			// secondo argomento, in quanto tempo
+
+
+			// memorizzo la distanza iniziale in z tra spawn point della nave
+			// e oggetto camera, questa distanza (salvo necessita di gameplay)
+			// dovrà essere mantenuta
+			CamOffset.Z = GetActorLocation().Z - MyCamera->GetActorLocation().Z;
+
+
 			return;
 		}
 	}
@@ -127,6 +136,7 @@ void APShip::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	ManageMove(DeltaTime);
+	
 	ManageFire(DeltaTime);
 
 }
@@ -170,6 +180,8 @@ void APShip::SpawnBullet()
 
 }
 
+
+/*
 void APShip::ManageMove(float DeltaTime)
 {
 	FVector Position{ GetActorLocation() }; // salvo posizione attuale
@@ -180,7 +192,40 @@ void APShip::ManageMove(float DeltaTime)
 
 	// aggiorno la posizione, seguendo il vettore combinato 
 	SetActorLocation(Position + (Direction * Vel * DeltaTime), true);
+}*/
+
+
+void APShip::ManageMove(float DeltaTime)
+{
+	FVector Direction{ front,left,0 };
+	Direction.Normalize(); // normalizzo il vettore portandol oa dimensione 1
+
+	// non baso più la posizione della nave su la propria locazione 
+	//+  (Direction * Vel * DeltaTime), ma utilizzo questi valori
+	// per modificare lo scarto tra ca,era e nave
+	
+	CamOffset += (Direction * Vel * DeltaTime);
+	
+	// sequenza di CLAMP per impedire all'offset (ovvero la distanza tra nave e camera)
+	// di superare certi range pre impostati 
+	if (CamOffset.X >  YLimit) CamOffset.X =  YLimit;
+	if (CamOffset.X < -YLimit) CamOffset.X = -YLimit;
+	if (CamOffset.Y >  XLimit) CamOffset.Y =  XLimit;
+	if (CamOffset.Y < -XLimit) CamOffset.Y = -XLimit;
+	
+	// la nuova locazione sarà uguale alla posizione della camera + lo
+	// scarto attuale
+	SetActorLocation(MyCamera->GetActorLocation() + CamOffset,true);
+
+	//FVector Position{ GetActorLocation() }; // salvo posizione attuale
+	// creo vettore temporaneo utilizzando i valori 
+	// catturati in input
+	
+
+	// aggiorno la posizione, seguendo il vettore combinato 
+	//SetActorLocation(Position + (Direction * Vel * DeltaTime), true);
 }
+
 
 // Called to bind functionality to input
 void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
