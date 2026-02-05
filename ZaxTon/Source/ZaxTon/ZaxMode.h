@@ -9,6 +9,8 @@
 /**
  * 
  */
+class ABaseFoe;
+
 UCLASS()
 class ZAXTON_API AZaxMode : public AGameMode
 {
@@ -18,6 +20,10 @@ public:
 
 	virtual void BeginPlay() override;
 	
+	// gestione di pool per spawn proiettili
+	TArray<ABaseFoe*> Available; // proiettili disponibili
+	TArray<ABaseFoe*> InUse;     //proiettili correntemente in uso
 
+	//virtual void StartPlay() override;
 
 };
