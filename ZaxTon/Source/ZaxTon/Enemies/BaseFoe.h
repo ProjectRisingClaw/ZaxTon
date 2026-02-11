@@ -28,6 +28,9 @@ public:
 	void DeActivate();
 
 	void Activate(FVector SpawnLocation, FRotator SpawnRotation);
+	
+
+	float Vel{ 300.f };
 
 protected:
 	// Called when the game starts or when spawned

@@ -2,6 +2,7 @@
 
 
 #include "PCamera.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 APCamera::APCamera()
@@ -12,6 +13,8 @@ APCamera::APCamera()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	SetRootComponent(Body);
 
+	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
+	TriggerBox->SetupAttachment(Body);
 
 	//memorizzo in una variabile il path dell'asset
 	auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Modules/SM_Parts_StarSparrow_Thruster.SM_Parts_StarSparrow_Thruster'");

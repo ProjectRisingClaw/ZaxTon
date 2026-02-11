@@ -18,12 +18,17 @@ void AZaxMode::BeginPlay()
 	for (int i = 0; i < 40; i++)
 	{
 		// creo istanza
-		auto Enemy{ GetWorld()->SpawnActor<ABaseFoe>(ABaseFoe::StaticClass()) };
+		ABaseFoe* Enemy{ GetWorld()->SpawnActor<ABaseFoe>(ABaseFoe::StaticClass()) };
+	
 		if (Enemy)
 		{
 			Enemy->SetOwner(this); // come creo il proiettile
 			// gli lascio un riferimento all'oggetto che lo ha creato
 			Enemy->DeActivate(); // disattivo istanza
+		
+			Available.AddUnique(Enemy);
+
+		    UE_LOG(LogTemp, Error, TEXT("Size %i"), Available.Num());
 		}
 		//Available.AddUnique(bull); // inserisco in array dei disponibili.
 	}

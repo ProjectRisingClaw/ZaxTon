@@ -69,7 +69,7 @@ APShip::APShip()
 	if (MyMesh)
 	{
 		Collision->SetCapsuleSize(64,32);
-		Collision->SetHiddenInGame(false); 
+		Collision->SetHiddenInGame(true); 
 		Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
 	}

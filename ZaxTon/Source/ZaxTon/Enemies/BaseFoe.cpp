@@ -57,6 +57,13 @@ void ABaseFoe::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (Durata > 0)
+//	{
+	//	Durata -= DeltaTime;
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+//	}
+//	else DeActivate();
+
 }
 
 

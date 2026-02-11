@@ -14,6 +14,9 @@ class ZAXTON_API APCamera : public AActor
 
 	UStaticMeshComponent* Body{ nullptr };
 
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* TriggerBox{ nullptr };
+
 	UPROPERTY(EditAnyWhere)
 	float Vel{ 100.f };
 
