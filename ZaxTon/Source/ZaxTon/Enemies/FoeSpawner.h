@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ZaxTon/Headers/Enumerators.h"
 #include "FoeSpawner.generated.h"
 
 UCLASS()
@@ -30,6 +31,8 @@ public:
 	UPROPERTY(EditAnyWhere, Category = "Spawn")
 	float Gap{ 200.f };
 
+	UPROPERTY(EditAnyWhere, Category = "Spawn")
+	EEnemyType EnemyType{ EEnemyType::EET_NemicoA };
 
 
 	UFUNCTION()

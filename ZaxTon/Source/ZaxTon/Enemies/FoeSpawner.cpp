@@ -42,6 +42,7 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector()* (Gap*i), GetActorRotation());
 			ToSpawn->SetVel(Vel);
+
 			MyGameMode->InUse.AddUnique(ToSpawn);
 
 		}

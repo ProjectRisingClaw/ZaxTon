@@ -4,6 +4,7 @@
 #include "BaseFoe.h"
 #include "Components/CapsuleComponent.h"
 #include "ZaxTon/ZaxMode.h" 
+#include "ZaxTon/Headers/DataTables.h"
 // Sets default values
 ABaseFoe::ABaseFoe()
 {
@@ -17,24 +18,21 @@ ABaseFoe::ABaseFoe()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
 
-	//auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01.SM_StarSparrow01'"); // funziona ugualmente ma non più necessario
-	auto Path = TEXT("/Game/StarSparrow/Meshes/Examples/SM_StarSparrow17");
-	//auto Path = TEXT("SM_StarSparrow01");
-	// 
-	// per sicurezza (ad esempio aver dato un path sbagliato) controllo con un cast
-	// che il puntatore restituito sia effettivamente a StaticMesh
 
+	// path della DataTable  per i nemici
+	auto Path = TEXT("/Game/DataTables/BPEnemyTable");
 
-	auto MyMesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),  // tipo dell'oggetto da trovare
-		nullptr,                                  // riferimeto ad oggetto se serve
-		Path));
+	UDataTable* MyDT{ LoadObject<UDataTable>(nullptr, Path) }; // recupero la DT tramite Path
+	// vado a trovare la riga che mi interessa sulla DT
+	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(FName("NemicoA"),TEXT("Context")) };
+
 
 	// path dell'asset
-	if (MyMesh)
+	if (MyRow->Mesh)
 	{
 		Collision->SetCapsuleSize(64, 32);
 		Collision->SetHiddenInGame(true);
-		Body->SetStaticMesh(MyMesh);
+		Body->SetStaticMesh(MyRow->Mesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
 		Body->CastShadow = false;
 
@@ -43,6 +41,8 @@ ABaseFoe::ABaseFoe()
 	{
 		UE_LOG(LogTemp, Error, TEXT(" no mesh "));
 	}
+
+
 
 
 }
