@@ -72,6 +72,7 @@ APShip::APShip()
 		Collision->SetHiddenInGame(true); 
 		Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+		Body->CastShadow = false;
 	}
 	else
 	{

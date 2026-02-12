@@ -6,6 +6,7 @@
 #include "../ZaxMode.h"
 #include "BaseFoe.h"
 #include "ZaxTon/Player/PCamera.h"
+#include "Components/ArrowComponent.h"
 //#include "ZaxTon/ZaxMode.h";
 
 // Sets default values
@@ -16,27 +17,35 @@ AFoeSpawner::AFoeSpawner()
 
 	SpawnPoint = CreateDefaultSubobject<USphereComponent>(TEXT("SpawnPoint"));
 	SetRootComponent(SpawnPoint);
+	SpawnPoint->bHiddenInGame = true;
+
+	Direction = CreateDefaultSubobject<UArrowComponent>(TEXT("Direction"));
+	Direction->SetupAttachment(SpawnPoint);
 
 }
 
 void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!MyGameMode) return;
+
 	if (!Cast<APCamera>(OtherActor)) return;
 
-	if (MyGameMode->Available.Num() < 1) return;
-
-	ABaseFoe* ToSpawn{ MyGameMode->Available.Pop() };
-
-	if (ToSpawn)
+	for (int i = 0; i < NumFoe; i++)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Spawn"));
+		if (MyGameMode->Available.Num() < 1) return;
 
-		ToSpawn->Activate(GetActorLocation(),FRotator(0,0,180) );
-		MyGameMode->InUse.AddUnique(ToSpawn);
+		ABaseFoe* ToSpawn{ MyGameMode->Available.Pop() };
 
+		if (ToSpawn)
+		{
+			//UE_LOG(LogTemp, Error, TEXT("Spawn"));
+
+			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector()* (Gap*i), GetActorRotation());
+			ToSpawn->SetVel(Vel);
+			MyGameMode->InUse.AddUnique(ToSpawn);
+
+		}
 	}
-
 
 }
 

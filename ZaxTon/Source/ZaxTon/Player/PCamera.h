@@ -20,6 +20,10 @@ class ZAXTON_API APCamera : public AActor
 	UPROPERTY(EditAnyWhere)
 	float Vel{ 100.f };
 
+	UFUNCTION()
+	void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
 public:	
 	// Sets default values for this actor's properties
 	APCamera();

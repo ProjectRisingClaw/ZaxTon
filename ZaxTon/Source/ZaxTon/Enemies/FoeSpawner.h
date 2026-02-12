@@ -13,13 +13,24 @@ class ZAXTON_API AFoeSpawner : public AActor
 	
 	UPROPERTY(VisibleAnyWhere)
 	class USphereComponent* SpawnPoint{ nullptr };
+	
+	UPROPERTY(VisibleAnyWhere)
+	class UArrowComponent* Direction{ nullptr };
 
 public:	
 	// Sets default values for this actor's properties
 	AFoeSpawner();
 
-	UPROPERTY(EditAnyWhere)
-	int NumFoe{ 1 };
+	UPROPERTY(EditAnyWhere, Category = "Spawn")
+	int   NumFoe{ 1 };
+
+	UPROPERTY(EditAnyWhere, Category = "Spawn")
+	float Vel{ 300.f };
+
+	UPROPERTY(EditAnyWhere, Category = "Spawn")
+	float Gap{ 200.f };
+
+
 
 	UFUNCTION()
 	void Overlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

@@ -19,7 +19,8 @@ class ZAXTON_API ABaseFoe : public AActor
 	//UStaticMeshComponent* Body = nullptr;
 
 	class UCapsuleComponent* Collision{ nullptr };
-
+	
+	float Vel{ 300.f };
 
 public:	
 	// Sets default values for this actor's properties
@@ -29,8 +30,8 @@ public:
 
 	void Activate(FVector SpawnLocation, FRotator SpawnRotation);
 	
-
-	float Vel{ 300.f };
+	FORCEINLINE void SetVel(float NewVel) { Vel = NewVel; };
+	
 
 protected:
 	// Called when the game starts or when spawned

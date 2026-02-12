@@ -3,6 +3,16 @@
 
 #include "PCamera.h"
 #include "Components/BoxComponent.h"
+#include "ZaxTon/Enemies/BaseFoe.h"
+
+void APCamera::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	// qui controllo che sia uscito dal Box della Camera, un nemico
+	// nel qaul caso, su di lui eseguo DeActivate
+	auto OutFoe{ Cast<ABaseFoe>(OtherActor) };
+	if (OutFoe) OutFoe->DeActivate();
+
+}
 
 // Sets default values
 APCamera::APCamera()
@@ -40,7 +50,7 @@ APCamera::APCamera()
 void APCamera::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	TriggerBox->OnComponentEndOverlap.AddDynamic(this,&APCamera::EndOverlap);
 
 }
 

@@ -33,9 +33,11 @@ ABaseFoe::ABaseFoe()
 	if (MyMesh)
 	{
 		Collision->SetCapsuleSize(64, 32);
-		Collision->SetHiddenInGame(false);
+		Collision->SetHiddenInGame(true);
 		Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+		Body->CastShadow = false;
+
 	}
 	else
 	{
@@ -101,6 +103,8 @@ void ABaseFoe::DeActivate()
 	{
 		MyGM->InUse.Remove(this); // remove toglie un elemento da un array, se lo trova
 		MyGM->Available.AddUnique(this);
+
+		UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili = %i"), MyGM->Available.Num());
 	}
 	// se sto tra quelli in uso, mi rimuovo dalla lista
 }
