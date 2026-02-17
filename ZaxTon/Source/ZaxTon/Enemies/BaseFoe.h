@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ZaxTon/Headers/DataTables.h"
 #include "BaseFoe.generated.h"
 
 UCLASS()
@@ -20,7 +21,12 @@ class ZAXTON_API ABaseFoe : public AActor
 
 	class UCapsuleComponent* Collision{ nullptr };
 	
+	UNiagaraSystem* ExplosionEffect;
+
 	float Vel{ 300.f };
+
+	// puntatore alla Data Table da cui prelevare le informazioni
+	UDataTable* MyDT{ nullptr };
 
 public:	
 	// Sets default values for this actor's properties
@@ -28,7 +34,7 @@ public:
 
 	void DeActivate();
 
-	void Activate(FVector SpawnLocation, FRotator SpawnRotation);
+	void Activate(FVector SpawnLocation, FRotator SpawnRotation, FName NewType);
 	
 	FORCEINLINE void SetVel(float NewVel) { Vel = NewVel; };
 	

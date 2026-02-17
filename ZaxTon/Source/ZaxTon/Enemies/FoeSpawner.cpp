@@ -40,7 +40,7 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		{
 			//UE_LOG(LogTemp, Error, TEXT("Spawn"));
 
-			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector()* (Gap*i), GetActorRotation());
+			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector()* (Gap*i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
 			ToSpawn->SetVel(Vel);
 
 			MyGameMode->InUse.AddUnique(ToSpawn);

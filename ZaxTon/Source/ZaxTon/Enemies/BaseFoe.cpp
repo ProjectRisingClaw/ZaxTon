@@ -4,7 +4,7 @@
 #include "BaseFoe.h"
 #include "Components/CapsuleComponent.h"
 #include "ZaxTon/ZaxMode.h" 
-#include "ZaxTon/Headers/DataTables.h"
+
 // Sets default values
 ABaseFoe::ABaseFoe()
 {
@@ -22,7 +22,7 @@ ABaseFoe::ABaseFoe()
 	// path della DataTable  per i nemici
 	auto Path = TEXT("/Game/DataTables/BPEnemyTable");
 
-	UDataTable* MyDT{ LoadObject<UDataTable>(nullptr, Path) }; // recupero la DT tramite Path
+	MyDT =  LoadObject<UDataTable>(nullptr, Path) ; // recupero la DT tramite Path
 	// vado a trovare la riga che mi interessa sulla DT
 	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(FName("NemicoA"),TEXT("Context")) };
 
@@ -70,8 +70,17 @@ void ABaseFoe::Tick(float DeltaTime)
 
 
 // 
-void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation)
+void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName NewType)
 {
+	// carico dati dalla DT
+	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(NewType,TEXT("Context")) };
+	if (MyRow)
+	{
+		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
+		ExplosionEffect =   MyRow->ExplosionFX; // copio valore VFX da Data table;
+	}
+	//
+
 	// disattivo collisione proiettile 
 	Body->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	// disattivo il tick
