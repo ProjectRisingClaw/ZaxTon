@@ -30,6 +30,8 @@ class ZAXTON_API ABaseFoe : public AActor
 	// puntatore alla Data Table da cui prelevare le informazioni
 	UDataTable* MyDT{ nullptr };
 
+	EWaveMode  WaveMode{ EWaveMode::EWM_Straight };
+
 public:	
 	// Sets default values for this actor's properties
 	ABaseFoe();

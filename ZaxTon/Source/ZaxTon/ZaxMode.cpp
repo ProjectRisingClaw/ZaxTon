@@ -27,7 +27,7 @@ void AZaxMode::BeginPlay()
 			// gli lascio un riferimento all'oggetto che lo ha creato
 			Enemy->DeActivate(); // disattivo istanza
 		
-			Available.AddUnique(Enemy);
+			//Available.AddUnique(Enemy);
 
 		   // UE_LOG(LogTemp, Error, TEXT("Size %i"), Available.Num());
 		}
@@ -39,7 +39,9 @@ void AZaxMode::BeginPlay()
 		{
 			Effect->SetOwner(this);	
 			Effect->DeActivate(); 
-			AvailableEffects.AddUnique(Effect);
+			//AvailableEffects.AddUnique(Effect);
+
+		    UE_LOG(LogTemp, Error, TEXT("Av Effects %i"), AvailableEffects.Num());
 		}
 
 	}

@@ -3,6 +3,7 @@
 
 #include "PCamera.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "ZaxTon/Enemies/BaseFoe.h"
 
 void APCamera::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -10,7 +11,12 @@ void APCamera::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	// qui controllo che sia uscito dal Box della Camera, un nemico
 	// nel qaul caso, su di lui eseguo DeActivate
 	auto OutFoe{ Cast<ABaseFoe>(OtherActor) };
-	if (OutFoe) OutFoe->DeActivate();
+
+
+	if (!OutFoe) return;
+	if (!Cast<USphereComponent>(OtherComp)) return;
+
+	OutFoe->DeActivate();
 
 }
 

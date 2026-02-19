@@ -43,7 +43,7 @@ APBullet::APBullet()
 void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation)
 {
 	// disattivo collisione proiettile 
-	Body->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	// disattivo il tick
 	PrimaryActorTick.bCanEverTick = true;
 	// nascondo grafica del proiettile
@@ -59,7 +59,10 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation)
 void APBullet::DeActivate()
 {
 	// disattivo collisione proiettile 
+
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// disattivo il tick
 	PrimaryActorTick.bCanEverTick = false;
 	// nascondo grafica del proiettile
@@ -96,7 +99,9 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	if (!Cast<USphereComponent>(OtherComp)) return; // desidero l'overlap preciso con la capsula
 
 	Foe->SpawnDieEffect(); // effetto particellare esplosione
+
 	Foe->DeActivate();  // rimuovo nemico
+	
 	DeActivate(); // rimuovo me stesso
 
 

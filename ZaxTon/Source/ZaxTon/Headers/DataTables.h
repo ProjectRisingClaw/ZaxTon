@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/DataTable.h"
+#include "Enumerators.h"
 #include "NiagaraSystem.h"
 #include "DataTables.generated.h"
 
@@ -14,5 +15,7 @@ struct FEnemyTableRaw : public FTableRowBase
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	UNiagaraSystem* ExplosionFX{ nullptr };
 
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	EWaveMode  WaveMode{ EWaveMode::EWM_Straight };
 
 };

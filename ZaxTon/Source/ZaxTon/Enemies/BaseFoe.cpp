@@ -59,12 +59,36 @@ void ABaseFoe::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (Durata > 0)
-//	{
-	//	Durata -= DeltaTime;
+	
+		switch (WaveMode)
+		{
+		case EWaveMode::EWM_Straight:
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-//	}
-//	else DeActivate();
+		break;
+
+		case EWaveMode::EWM_Sinus:
+        // si muove seguendo una sinusoide
+		// posso decidere l'ampiezza
+
+		break;
+
+		case EWaveMode::EWM_Wait:
+        // va dritto ma entrato nello schermo, per un tempo
+		//deciso da noi smette di avanzare (va alla velocità della camera)
+		// poi prosegue
+
+		break;
+
+		case EWaveMode::EWM_Back:
+
+        // una volta che è arrivato a fondo scherm oanche senza uscire
+
+        // una volta uscito dallo schermo in basso torna indietro 
+		// ed esce dalla parte alta
+		break;
+	
+		}
+
 
 }
 
@@ -85,11 +109,12 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 	{
 		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
 		ExplosionEffect =   MyRow->ExplosionFX; // copio valore VFX da Data table;
+		WaveMode        =   MyRow->WaveMode;
 	}
 	//
 
 	// disattivo collisione proiettile 
-	Body->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	
 	// nascondo grafica del proiettile
 	Body->SetHiddenInGame(false);
@@ -110,6 +135,7 @@ void ABaseFoe::SpawnDieEffect()
 	if (MyGM)
 	{
 		auto NewEffect{ MyGM->AvailableEffects.Pop() };
+		if (!NewEffect) return;
 		NewEffect->Activate(GetActorLocation(),FRotator(0),ExplosionEffect);
 	}
 }
@@ -117,8 +143,13 @@ void ABaseFoe::SpawnDieEffect()
 
 void ABaseFoe::DeActivate()
 {
+	UE_LOG(LogTemp, Warning, TEXT("chiamo deactive"))
+
 	// disattivo collisione proiettile 
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// disattivo il tick
 	PrimaryActorTick.bCanEverTick = false;
 	// nascondo grafica del proiettile
@@ -130,10 +161,12 @@ void ABaseFoe::DeActivate()
 	auto MyGM{ Cast<AZaxMode>(GetOwner()) }; // controllo che Owner sia di tipo APShip
 	if (MyGM)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili"));
+
 		MyGM->InUse.Remove(this); // remove toglie un elemento da un array, se lo trova
 		MyGM->Available.AddUnique(this);
 
-		//UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili = %i"), MyGM->Available.Num());
+		
 	}
 	// se sto tra quelli in uso, mi rimuovo dalla lista
 }

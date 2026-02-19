@@ -12,6 +12,9 @@ AExplosion::AExplosion()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	Comp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Comp"));
+	SetRootComponent(Comp);
+	Comp->SetAutoDestroy(false);
+	Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 
