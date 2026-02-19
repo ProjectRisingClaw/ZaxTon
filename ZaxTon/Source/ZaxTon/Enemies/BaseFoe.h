@@ -7,6 +7,8 @@
 #include "ZaxTon/Headers/DataTables.h"
 #include "BaseFoe.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class ZAXTON_API ABaseFoe : public AActor
 {
@@ -19,7 +21,7 @@ class ZAXTON_API ABaseFoe : public AActor
 	UStaticMeshComponent* Body{ nullptr };
 	//UStaticMeshComponent* Body = nullptr;
 
-	class UCapsuleComponent* Collision{ nullptr };
+	USphereComponent* Collision{ nullptr };
 	
 	UNiagaraSystem* ExplosionEffect;
 
@@ -38,6 +40,8 @@ public:
 	
 	FORCEINLINE void SetVel(float NewVel) { Vel = NewVel; };
 	
+	void SpawnDieEffect();
+
 
 protected:
 	// Called when the game starts or when spawned

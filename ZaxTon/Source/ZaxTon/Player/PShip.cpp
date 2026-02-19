@@ -4,7 +4,7 @@
 #include "PShip.h"
 // qui includo effettivamente i dati
 // della capsula
-#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "EngineUtils.h" // per poter utilizzare gli iteratori
 #include "PCamera.h"     // includo l'oggetto a cui passare la visuale
 #include "GameFramework/PlayerInput.h" // per selezione tasti input
@@ -47,7 +47,7 @@ APShip::APShip()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// pointer                         tipo da creare          // nome scelto
-	Collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
+	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SetRootComponent(Collision);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
@@ -68,7 +68,7 @@ APShip::APShip()
 	                               // path dell'asset
 	if (MyMesh)
 	{
-		Collision->SetCapsuleSize(64,32);
+		Collision->SetSphereRadius(64);
 		Collision->SetHiddenInGame(true); 
 		Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));

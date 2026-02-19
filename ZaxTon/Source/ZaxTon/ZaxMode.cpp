@@ -3,6 +3,7 @@
 
 #include "ZaxMode.h"
 #include "Enemies/BaseFoe.h"
+#include "Effects/Explosion.h"
 /*
 void AZaxMode::StartPlay()
 {
@@ -28,9 +29,19 @@ void AZaxMode::BeginPlay()
 		
 			Available.AddUnique(Enemy);
 
-		    UE_LOG(LogTemp, Error, TEXT("Size %i"), Available.Num());
+		   // UE_LOG(LogTemp, Error, TEXT("Size %i"), Available.Num());
 		}
 		//Available.AddUnique(bull); // inserisco in array dei disponibili.
+
+		AExplosion* Effect{ GetWorld()->SpawnActor<AExplosion>(AExplosion::StaticClass()) };
+
+		if (Effect)
+		{
+			Effect->SetOwner(this);	
+			Effect->DeActivate(); 
+			AvailableEffects.AddUnique(Effect);
+		}
+
 	}
 
 

@@ -8,6 +8,7 @@
 
 
 class APBullet; // forward declaration per bullet, dato che lo includo solo nel cpp
+class USphereComponent;
 
 UCLASS()
 class ZAXTON_API APShip : public APawn
@@ -21,7 +22,7 @@ class ZAXTON_API APShip : public APawn
 	UStaticMeshComponent*    Body{ nullptr };
 	//UStaticMeshComponent* Body = nullptr;
 
-	class UCapsuleComponent* Collision{ nullptr };
+	USphereComponent* Collision{ nullptr };
 
 	// funzioni gestione movimento
 	void  MoveForward(float Input);

@@ -3,6 +3,8 @@
 
 #include "PBullet.h"
 #include "PShip.h" // altrimenti non posso utilizzare variabili e funzioni di questa classe
+#include "ZaxTon/Enemies/BaseFoe.h" // includo il nemico per poterlo colpire
+#include "Components/SphereComponent.h"
 
 // Sets default values
 APBullet::APBullet()
@@ -10,9 +12,14 @@ APBullet::APBullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	Collision->SetSphereRadius(26);
+	Collision->SetHiddenInGame(true);
+
+	SetRootComponent(Collision);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
-	SetRootComponent(Body);
+	Body->SetupAttachment(Collision);
 
 	//memorizzo in una variabile il path dell'asset
 	auto Path = TEXT("StaticMesh'/Engine/VREditor/TransformGizmo/SM_Sequencer_Node.SM_Sequencer_Node'");
@@ -75,6 +82,24 @@ void APBullet::BeginPlay()
 {
 	Super::BeginPlay();
 	//SetLifeSpan(1.5f); // dopo 1.5 secondi viene rimosso
+
+	// attivo evento di overlap ad inizio gioco
+	Collision->OnComponentBeginOverlap.AddDynamic(this, &APBullet::HitEnemy);
+
+}
+
+void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	auto Foe{ Cast<ABaseFoe>(OtherActor) }; // controllo che in overlap ci sia un basefoe
+	if (!Foe) return;
+
+	if (!Cast<USphereComponent>(OtherComp)) return; // desidero l'overlap preciso con la capsula
+
+	Foe->SpawnDieEffect(); // effetto particellare esplosione
+	Foe->DeActivate();  // rimuovo nemico
+	DeActivate(); // rimuovo me stesso
+
+
 }
 
 // Called every frame

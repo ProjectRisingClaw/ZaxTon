@@ -14,6 +14,7 @@
  * 
  */
 class ABaseFoe;
+class AExplosion;
 
 UCLASS()
 class ZAXTON_API AZaxMode : public AGameMode
@@ -29,5 +30,8 @@ public:
 	TArray<ABaseFoe*> InUse;     //proiettili correntemente in uso
 
 	//virtual void StartPlay() override;
+	// array per actor con Niagaracomponent.
+	TArray<AExplosion*> AvailableEffects;
+
 
 };

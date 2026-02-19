@@ -6,13 +6,18 @@
 #include "GameFramework/Actor.h"
 #include "PBullet.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class ZAXTON_API APBullet : public AActor
 {
 	GENERATED_BODY()
 	
 
+	USphereComponent*     Collision{ nullptr };
+
 	UStaticMeshComponent* Body{ nullptr };
+
 	float Vel{ 3500.f };
 
 public:	
@@ -34,6 +39,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION() // forzato per ogni funzione di cui fare bind
+	void HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:	
 	// Called every frame

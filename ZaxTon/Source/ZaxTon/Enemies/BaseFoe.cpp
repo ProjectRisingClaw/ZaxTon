@@ -2,8 +2,10 @@
 
 
 #include "BaseFoe.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+#include "NiagaraFunctionLibrary.h" // per spawn di niagara system
 #include "ZaxTon/ZaxMode.h" 
+#include "ZaxTon/Effects/Explosion.h"
 
 // Sets default values
 ABaseFoe::ABaseFoe()
@@ -12,7 +14,7 @@ ABaseFoe::ABaseFoe()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// pointer                         tipo da creare          // nome scelto
-	Collision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
+	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SetRootComponent(Collision);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
@@ -30,7 +32,7 @@ ABaseFoe::ABaseFoe()
 	// path dell'asset
 	if (MyRow->Mesh)
 	{
-		Collision->SetCapsuleSize(64, 32);
+		Collision->SetSphereRadius(64);
 		Collision->SetHiddenInGame(true);
 		Body->SetStaticMesh(MyRow->Mesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
@@ -41,8 +43,6 @@ ABaseFoe::ABaseFoe()
 	{
 		UE_LOG(LogTemp, Error, TEXT(" no mesh "));
 	}
-
-
 
 
 }
@@ -69,9 +69,16 @@ void ABaseFoe::Tick(float DeltaTime)
 }
 
 
+
+
+
+
 // 
 void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName NewType)
 {
+	
+	PrimaryActorTick.bCanEverTick = true;
+
 	// carico dati dalla DT
 	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(NewType,TEXT("Context")) };
 	if (MyRow)
@@ -83,8 +90,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 
 	// disattivo collisione proiettile 
 	Body->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	// disattivo il tick
-	PrimaryActorTick.bCanEverTick = true;
+	
 	// nascondo grafica del proiettile
 	Body->SetHiddenInGame(false);
 	// posiziono l'oggetto in una zona lontana da quella di azione
@@ -92,6 +98,20 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 	SetActorRotation(SpawnRotation);
 	//Durata = 1.5; // ripristino durata proiettile
 
+}
+
+void ABaseFoe::SpawnDieEffect()
+{
+	if (!ExplosionEffect) return; // controllo di sicurezza se non ho definito il particellare esco
+
+	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExplosionEffect,GetActorLocation());
+
+	auto MyGM{ Cast<AZaxMode>(GetOwner()) };
+	if (MyGM)
+	{
+		auto NewEffect{ MyGM->AvailableEffects.Pop() };
+		NewEffect->Activate(GetActorLocation(),FRotator(0),ExplosionEffect);
+	}
 }
 
 
@@ -113,7 +133,7 @@ void ABaseFoe::DeActivate()
 		MyGM->InUse.Remove(this); // remove toglie un elemento da un array, se lo trova
 		MyGM->Available.AddUnique(this);
 
-		UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili = %i"), MyGM->Available.Num());
+		//UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili = %i"), MyGM->Available.Num());
 	}
 	// se sto tra quelli in uso, mi rimuovo dalla lista
 }
