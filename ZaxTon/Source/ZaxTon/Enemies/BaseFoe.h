@@ -8,6 +8,7 @@
 #include "BaseFoe.generated.h"
 
 class USphereComponent;
+class AZaxMode;
 
 UCLASS()
 class ZAXTON_API ABaseFoe : public AActor
@@ -32,7 +33,23 @@ class ZAXTON_API ABaseFoe : public AActor
 
 	EWaveMode  WaveMode{ EWaveMode::EWM_Straight };
 
+	FVector StartLocation{ 0,0,0 }; // locazione iniziale
+	// set di variabili custom da utilizzare per diversi
+	// scopi a seconda del tipo di ondata
+	float Customf1{ 0.f }; // ampiezza curva	
+	float Customf2{ 0.f }; // vel curva
+	float Customf3{ 0.f }; // utilizzo per gradi attuali
+
+	int8  Customi1{ 0   }; //-128 + 128
+
+	uint8 SubState{ 0 }; // utilizzato per switch dei "sotto stati" di un singolo comportamento
+
 public:	
+
+	FORCEINLINE void SetCustom3(float NewVal) { Customf3 = NewVal; };
+
+	AZaxMode* MyGM{ nullptr };
+
 	// Sets default values for this actor's properties
 	ABaseFoe();
 
@@ -50,7 +67,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	
+
+	void UpdateLoc(float DeltaTime);
 
 };

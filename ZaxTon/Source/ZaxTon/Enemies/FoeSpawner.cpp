@@ -42,6 +42,22 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector()* (Gap*i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
 			ToSpawn->SetVel(Vel);
+			switch (EnemyType)
+			{
+			case EEnemyType::EET_NemicoA:
+			break;
+			case EEnemyType::EET_NemicoB: // per il nemico B passo i gradi inziali per la sinusoide
+			ToSpawn->SetCustom3(20 * i);
+			break;
+			case EEnemyType::EET_NemicoC:
+			break;
+			case EEnemyType::EET_NemicoD:
+			break;
+		
+			}
+
+
+		
 
 			MyGameMode->InUse.AddUnique(ToSpawn);
 

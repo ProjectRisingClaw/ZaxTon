@@ -11,7 +11,7 @@
 ABaseFoe::ABaseFoe()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	// pointer                         tipo da creare          // nome scelto
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
@@ -45,6 +45,7 @@ ABaseFoe::ABaseFoe()
 	}
 
 
+	
 }
 
 // Called when the game starts or when spawned
@@ -52,44 +53,74 @@ void ABaseFoe::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
+
+
 }
 
-// Called every frame
-void ABaseFoe::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-	
-		switch (WaveMode)
-		{
-		case EWaveMode::EWM_Straight:
+void ABaseFoe::UpdateLoc(float DeltaTime)
+{
+	switch (WaveMode)
+	{
+	case EWaveMode::EWM_Straight:
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 		break;
 
-		case EWaveMode::EWM_Sinus:
-        // si muove seguendo una sinusoide
+	case EWaveMode::EWM_Sinus:
+	{
+		// customf3 qui mi serve per identificare i gradi
+		// se Customf2 vale 360 ci metterò 1 secondo a compiere un 
+		// oscillazione
+		Customf3 += Customf2 * DeltaTime;
+		//float Sin{ FMath::Sin(FMath::DegreesToRadians(Customf3)) };
+
+		float Sin{ MyGM->sinLUT[uint8(Customf3)] };
+		float Amp = Sin * Customf1;  // moltiplico il
+		// valore del seno (che sta ra -1 e 1) per una mia
+		// variabile che rappresenta la larghezza dell'oscillazione
+		// si muove seguendo una sinusoide
 		// posso decidere l'ampiezza
+		FVector Loc = GetActorLocation();
+		//	FVector BLoc{ Loc }; // memorizzo locazione prima di cambiarla
+		Loc.X -= Vel * DeltaTime;
+		Loc.Y = StartLocation.Y + Amp; // sommo sull'asse Y per ottenere effetto sinus
 
-		break;
 
-		case EWaveMode::EWM_Wait:
-        // va dritto ma entrato nello schermo, per un tempo
+		SetActorLocation(Loc);
+		/*FVector DLoc{Loc - BLoc};
+		SetActorRotation(DLoc.Rotation());*/
+
+		//float Seno = FMath::sin();
+		//SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+	}
+	break;
+
+	case EWaveMode::EWM_Wait:
+		// va dritto ma entrato nello schermo, per un tempo
 		//deciso da noi smette di avanzare (va alla velocità della camera)
 		// poi prosegue
+		switch (SubState)
+		{
+		case 0:   break; // avanza fino ad una certa distanza dal centro visuale
+		case 1:   break; // sta fermo per un certo periodo (eventualmente spara)
+		case 2:   break; // riprende ad avanzare e successivamente esce dallo schermo
+		}
+		//MyGM->MyCamera;
 
-		break;
 
-		case EWaveMode::EWM_Back:
+	break;
 
-        // una volta che è arrivato a fondo scherm oanche senza uscire
+	case EWaveMode::EWM_Back:
 
-        // una volta uscito dallo schermo in basso torna indietro 
+		// una volta che è arrivato a fondo scherm oanche senza uscire
+
+		// una volta uscito dallo schermo in basso torna indietro 
 		// ed esce dalla parte alta
 		break;
-	
-		}
 
-
+	}
 }
 
 
@@ -101,8 +132,10 @@ void ABaseFoe::Tick(float DeltaTime)
 void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName NewType)
 {
 	
-	PrimaryActorTick.bCanEverTick = true;
+	//PrimaryActorTick.bCanEverTick = true;
+	StartLocation = SpawnLocation; // salvo locazione al momento di essere attivato
 
+	SubState = 0; // se serve gestire dei sotto stati, azzero l'indice dello switch interno 
 	// carico dati dalla DT
 	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(NewType,TEXT("Context")) };
 	if (MyRow)
@@ -110,6 +143,31 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
 		ExplosionEffect =   MyRow->ExplosionFX; // copio valore VFX da Data table;
 		WaveMode        =   MyRow->WaveMode;
+		
+		// a seconda del tipo di ondata inzializo i due valori custom
+		// in maniera differente
+		switch (WaveMode)
+		{
+		case EWaveMode::EWM_Straight:
+
+		break;
+
+		case EWaveMode::EWM_Sinus:
+    	Customf1 = MyRow->SinusAmp;
+		Customf2 = MyRow->Frequenza;
+		//Customf3 = 0; // inizializzo i gradi a zero
+		break;
+
+		case EWaveMode::EWM_Wait:
+		break;
+
+		case EWaveMode::EWM_Back:
+		break;
+
+
+		}
+
+
 	}
 	//
 
@@ -131,7 +189,7 @@ void ABaseFoe::SpawnDieEffect()
 
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExplosionEffect,GetActorLocation());
 
-	auto MyGM{ Cast<AZaxMode>(GetOwner()) };
+	//auto MyGM{ Cast<AZaxMode>(GetOwner()) };
 	if (MyGM)
 	{
 		auto NewEffect{ MyGM->AvailableEffects.Pop() };
@@ -151,14 +209,14 @@ void ABaseFoe::DeActivate()
 	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// disattivo il tick
-	PrimaryActorTick.bCanEverTick = false;
+	//PrimaryActorTick.bCanEverTick = false;
 	// nascondo grafica del proiettile
 	Body->SetHiddenInGame(true);
 	// posiziono l'ogggetto in una zona lontana da quella di azione
 	SetActorLocation(FVector(0, 0, -10000));
 
 	// mi inserisco tra i disponibili
-	auto MyGM{ Cast<AZaxMode>(GetOwner()) }; // controllo che Owner sia di tipo APShip
+	//auto MyGM{ Cast<AZaxMode>(GetOwner()) }; // controllo che Owner sia di tipo APShip
 	if (MyGM)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili"));

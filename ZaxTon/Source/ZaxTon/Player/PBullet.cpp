@@ -10,7 +10,7 @@
 APBullet::APBullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	Collision->SetSphereRadius(26);
@@ -44,8 +44,8 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation)
 {
 	// disattivo collisione proiettile 
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	// disattivo il tick
-	PrimaryActorTick.bCanEverTick = true;
+
+	//PrimaryActorTick.bCanEverTick = true;
 	// nascondo grafica del proiettile
 	Body->SetHiddenInGame(false);
 	// posiziono l'ogggetto in una zona lontana da quella di azione
@@ -64,7 +64,7 @@ void APBullet::DeActivate()
 	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// disattivo il tick
-	PrimaryActorTick.bCanEverTick = false;
+	//PrimaryActorTick.bCanEverTick = false;
 	// nascondo grafica del proiettile
 	Body->SetHiddenInGame(true);
 	// posiziono l'ogggetto in una zona lontana da quella di azione
@@ -107,17 +107,14 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 
 }
 
-// Called every frame
-void APBullet::Tick(float DeltaTime)
+
+void APBullet::UpdateLoc(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-	// prosegue diritto di fronte a se
 	if (Durata > 0)
 	{
 		Durata -= DeltaTime;
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 	}
 	else DeActivate();
-
 }
 

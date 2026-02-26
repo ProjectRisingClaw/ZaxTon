@@ -140,6 +140,12 @@ void APShip::Tick(float DeltaTime)
 	
 	ManageFire(DeltaTime);
 
+	for (int i = 0; i < InUse.Num(); i++)
+	{
+		InUse[i]->UpdateLoc(DeltaTime);
+	}
+
+
 }
 
 void APShip::ManageFire(float DeltaTime)

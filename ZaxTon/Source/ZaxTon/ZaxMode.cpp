@@ -4,6 +4,9 @@
 #include "ZaxMode.h"
 #include "Enemies/BaseFoe.h"
 #include "Effects/Explosion.h"
+#include "Player/PCamera.h"
+#include "EngineUtils.h" // per iteratore
+
 /*
 void AZaxMode::StartPlay()
 {
@@ -16,6 +19,12 @@ void AZaxMode::BeginPlay()
 	Super::BeginPlay();
 	//UE_LOG(LogTemp, Error, TEXT("Begin"));
 
+	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
+	{
+		MyCamera = *CamList;
+	}
+
+
 	for (int i = 0; i < 40; i++)
 	{
 		// creo istanza
@@ -23,7 +32,8 @@ void AZaxMode::BeginPlay()
 	
 		if (Enemy)
 		{
-			Enemy->SetOwner(this); // come creo il proiettile
+		 //Enemy->SetOwner(this); // come creo il proiettile
+			Enemy->MyGM = this;
 			// gli lascio un riferimento all'oggetto che lo ha creato
 			Enemy->DeActivate(); // disattivo istanza
 		
@@ -46,6 +56,17 @@ void AZaxMode::BeginPlay()
 
 	}
 
+
+}
+
+void AZaxMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	for (int i = 0; i < InUse.Num(); i++)
+	{
+		InUse[i]->UpdateLoc(DeltaTime);
+	}
 
 }
 

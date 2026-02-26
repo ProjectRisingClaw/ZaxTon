@@ -9,6 +9,8 @@
 
 class APBullet; // forward declaration per bullet, dato che lo includo solo nel cpp
 class USphereComponent;
+class APCamera;
+
 
 UCLASS()
 class ZAXTON_API APShip : public APawn
@@ -70,7 +72,7 @@ public:
 
 	// puntatore per memorizzare riferimento all'oggetto usato
 	//come punto di vista 
-	class APCamera* MyCamera;
+	APCamera* MyCamera;
 
 protected:
 	// Called when the game starts or when spawned
