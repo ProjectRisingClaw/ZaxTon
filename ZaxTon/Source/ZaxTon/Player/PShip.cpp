@@ -106,6 +106,17 @@ void APShip::BeginPlay()
 	// Arg1: inizializzo un array di puntatori con lista di oggetti del tipo desiderato 
 	// Arg2: il nome dell'array, diventa falso quando l'array è finito
 	// Arg3: incremento passo all'elemento successivo dell'array
+
+
+	int ugo = 0;
+
+	for (int i = 0; i < 25; i++)
+	{
+		ugo += 2;
+	}
+
+
+
 	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
 	{
 		MyCamera = *CamList;

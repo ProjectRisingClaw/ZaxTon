@@ -6,6 +6,8 @@
 #include "NiagaraFunctionLibrary.h" // per spawn di niagara system
 #include "ZaxTon/ZaxMode.h" 
 #include "ZaxTon/Effects/Explosion.h"
+#include "ZaxTon/Player/PCamera.h" 
+#include "EngineUtils.h"
 
 // Sets default values
 ABaseFoe::ABaseFoe()
@@ -20,14 +22,12 @@ ABaseFoe::ABaseFoe()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
 
-
 	// path della DataTable  per i nemici
 	auto Path = TEXT("/Game/DataTables/BPEnemyTable");
 
 	MyDT =  LoadObject<UDataTable>(nullptr, Path) ; // recupero la DT tramite Path
 	// vado a trovare la riga che mi interessa sulla DT
 	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(FName("NemicoA"),TEXT("Context")) };
-
 
 	// path dell'asset
 	if (MyRow->Mesh)
@@ -53,8 +53,9 @@ void ABaseFoe::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
-
+	// memorizzo il pointer alla camera
+	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
+	{ MyCamera = *CamList; }
 
 }
 
@@ -65,7 +66,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 	{
 	case EWaveMode::EWM_Straight:
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-		break;
+	break;
 
 	case EWaveMode::EWM_Sinus:
 	{
@@ -103,9 +104,40 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 		// poi prosegue
 		switch (SubState)
 		{
-		case 0:   break; // avanza fino ad una certa distanza dal centro visuale
-		case 1:   break; // sta fermo per un certo periodo (eventualmente spara)
-		case 2:   break; // riprende ad avanzare e successivamente esce dallo schermo
+		case 0:
+		{
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+			double Dist{ abs(MyCamera->GetActorLocation().X - GetActorLocation().X) };
+			//+ Customf1
+			if (Dist < Customf1)
+			{
+				SubState = 1;
+				Vel = -MyCamera->GetVel();
+				//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
+			}
+
+		}
+		break; // avanza fino ad una certa distanza dal centro visuale
+		
+	
+		case 1:  
+
+			Customf2 -= DeltaTime;
+
+			if (Customf2  > 0)
+			{
+				SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+			}
+			else { Vel = 400.f; SubState = 2; }
+			
+		break; // sta fermo per un certo periodo (eventualmente spara)
+
+
+		case 2:  
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		break; // riprende ad avanzare e successivamente esce dallo schermo
+
 		}
 		//MyGM->MyCamera;
 
@@ -114,11 +146,144 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 
 	case EWaveMode::EWM_Back:
 
-		// una volta che è arrivato a fondo scherm oanche senza uscire
+		// una volta che è arrivato a fondo schermo anche senza uscire
 
 		// una volta uscito dallo schermo in basso torna indietro 
 		// ed esce dalla parte alta
-		break;
+		
+
+		switch (SubState)
+		{
+		case 0:
+		{
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+			FVector CamLocation{ MyCamera->GetActorLocation() }; // memorizzo loc camera
+			        CamLocation.Z = GetActorLocation().Z;
+
+			FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * -100.f) };  // 400.f
+
+			double CamLoc{ Point.X };
+
+			DrawDebugSphere(GetWorld(), Point,34,20,FColor::Red);
+
+			double Dist{ abs( CamLoc - GetActorLocation().X) };
+			//+ Customf1
+			//UE_LOG(LogTemp, Error, TEXT("Dist = %f Custom = %f"), Dist, Customf1);
+
+			if (Dist < Customf1)
+			{
+				SubState = 1;
+				//Vel = -MyCamera->GetVel();
+				//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
+				// memorizzo la mia rotazione 
+				//al momento di dover virarae
+				//StartRotation  = GetActorRotation();
+				//TargetRotation = StartRotation + FRotator(180, 0, 0);
+				
+				StartPitch = GetActorRotation().Pitch;
+				TargetPitch = StartPitch + 180;
+				//TargetRotation.is
+				Vel *= 2;
+
+			}
+
+		}
+		break; // avanza fino ad una certa distanza dal centro visuale
+
+
+		case 1:
+
+		/*
+			StartRotation = GetActorRotation();
+
+			if (FMath::IsNearlyEqual(StartPitch, TargetPitch, 2.f))
+			{
+				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"), Vel);
+				Vel *= 3;
+				SubState = 2;
+				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"),Vel);
+				StartPitch = TargetPitch;
+			}
+			else
+			{
+				StartPitch += 360 * DeltaTime;
+				if (StartPitch > TargetPitch) StartPitch = TargetPitch;
+
+
+			}
+			//StartRotation = FMath::RInterpConstantTo(StartRotation, TargetRotation, DeltaTime, 180.f);
+			//StartPitch = FMath::FInterpConstantTo(StartPitch, TargetPitch, DeltaTime, 180.f);
+			
+			StartPitch = FRotator::NormalizeAxis(StartPitch);
+			StartRotation.Pitch = StartPitch;
+
+
+
+			SetActorRotation(StartRotation);
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+			
+	     */
+
+		 // Angolo di rotazione continuo
+
+			if (FMath::IsNearlyEqual(StartPitch, TargetPitch, 2.f))
+			{
+				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"), Vel);
+				Vel *= 3;
+				SubState = 2;
+				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"),Vel);
+				StartPitch = TargetPitch;
+			}
+			else
+			{
+
+				StartPitch += DeltaTime * 180;
+
+				// Crea quaternione per rotazione sull'asse X (pitch)
+				FQuat PitchQuat = FQuat(FVector::RightVector, FMath::DegreesToRadians(StartPitch));
+
+				SetActorRotation(PitchQuat);
+			}
+			// Applica al componente
+		/*	USceneComponent* Root = GetRootComponent();
+			
+			if (Root)
+			{
+				SetActorRotation(,)
+
+				// Se vuoi mantenere altre rotazioni
+				FQuat CurrentRotation = Root->GetComponentQuat();
+				FQuat NewRotation = CurrentRotation * PitchQuat;
+				Root->SetWorldQuat(NewRotation);
+			}*/
+
+
+
+
+
+
+
+			//else { Vel = 400.f; SubState = 2; }
+
+		break; // sta fermo per un certo periodo (eventualmente spara)
+
+
+		case 2:
+
+			/*DrawDebugLine(GetWorld(),
+							GetActorLocation(), 
+							GetActorLocation() + GetActorForwardVector() * Vel, 
+					        FColor::Magenta , false,-1,5) ;*/
+
+			
+
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		break; // riprende ad avanzare e successivamente esce dallo schermo
+
+		}
+
+	break;
 
 	}
 }
@@ -148,9 +313,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		// in maniera differente
 		switch (WaveMode)
 		{
-		case EWaveMode::EWM_Straight:
-
-		break;
+		case EWaveMode::EWM_Straight: break;
 
 		case EWaveMode::EWM_Sinus:
     	Customf1 = MyRow->SinusAmp;
@@ -159,9 +322,13 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		break;
 
 		case EWaveMode::EWM_Wait:
+		Customf1 = MyRow->CamDistance;
+		Customf2 = MyRow->Counter;
 		break;
 
 		case EWaveMode::EWM_Back:
+		Customf1 = MyRow->CamDistance;
+		Customf2 = MyRow->Counter;
 		break;
 
 
@@ -219,7 +386,7 @@ void ABaseFoe::DeActivate()
 	//auto MyGM{ Cast<AZaxMode>(GetOwner()) }; // controllo che Owner sia di tipo APShip
 	if (MyGM)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili"));
+		//UE_LOG(LogTemp, Warning, TEXT("Mi rimuovo disponibili"));
 
 		MyGM->InUse.Remove(this); // remove toglie un elemento da un array, se lo trova
 		MyGM->Available.AddUnique(this);

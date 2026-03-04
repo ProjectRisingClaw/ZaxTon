@@ -28,6 +28,8 @@ public:
 	// Sets default values for this actor's properties
 	APCamera();
 
+	FORCEINLINE float GetVel() { return Vel; };
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

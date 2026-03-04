@@ -9,6 +9,7 @@
 
 class USphereComponent;
 class AZaxMode;
+class APCamera;
 
 UCLASS()
 class ZAXTON_API ABaseFoe : public AActor
@@ -31,9 +32,18 @@ class ZAXTON_API ABaseFoe : public AActor
 	// puntatore alla Data Table da cui prelevare le informazioni
 	UDataTable* MyDT{ nullptr };
 
+	// puntatore dove memorizzare un riferimento alla camera in gioco
+	APCamera* MyCamera{ nullptr };
+
 	EWaveMode  WaveMode{ EWaveMode::EWM_Straight };
 
 	FVector StartLocation{ 0,0,0 }; // locazione iniziale
+
+	FRotator StartRotation{ 0,0,0 };
+	FRotator TargetRotation{ 0,0,0 };
+
+	float StartPitch{ 0};
+	float TargetPitch{ 0 };
 	// set di variabili custom da utilizzare per diversi
 	// scopi a seconda del tipo di ondata
 	float Customf1{ 0.f }; // ampiezza curva	

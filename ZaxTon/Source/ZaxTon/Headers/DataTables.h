@@ -24,4 +24,11 @@ struct FEnemyTableRaw : public FTableRowBase
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	float Frequenza{ 100 };
 
+	// distanza dalla camera a cui fermarsi in modalità Wait
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float CamDistance{ 300 };
+
+	// variabile da sfruttare per definire un tempo limitato
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Counter{ 1.f };
 };

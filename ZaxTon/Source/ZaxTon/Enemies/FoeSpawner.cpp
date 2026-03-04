@@ -40,18 +40,27 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		{
 			//UE_LOG(LogTemp, Error, TEXT("Spawn"));
 
-			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector()* (Gap*i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
-			ToSpawn->SetVel(Vel);
+			
 			switch (EnemyType)
 			{
 			case EEnemyType::EET_NemicoA:
+			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
+			ToSpawn->SetVel(Vel);
+
 			break;
 			case EEnemyType::EET_NemicoB: // per il nemico B passo i gradi inziali per la sinusoide
+			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
+			ToSpawn->SetVel(Vel);
 			ToSpawn->SetCustom3(20 * i);
 			break;
 			case EEnemyType::EET_NemicoC:
+			ToSpawn->Activate(GetActorLocation() - GetActorRightVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
+			ToSpawn->SetVel(Vel);
+
 			break;
 			case EEnemyType::EET_NemicoD:
+			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
+			ToSpawn->SetVel(Vel);
 			break;
 		
 			}
