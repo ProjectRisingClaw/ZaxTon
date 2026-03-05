@@ -78,7 +78,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 
 		float Sin{ MyGM->sinLUT[uint8(Customf3)] };
 		float Amp = Sin * Customf1;  // moltiplico il
-		// valore del seno (che sta ra -1 e 1) per una mia
+		// valore del seno (che sta tra -1 e 1) per una mia
 		// variabile che rappresenta la larghezza dell'oscillazione
 		// si muove seguendo una sinusoide
 		// posso decidere l'ampiezza
@@ -100,7 +100,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 
 	case EWaveMode::EWM_Wait:
 		// va dritto ma entrato nello schermo, per un tempo
-		//deciso da noi smette di avanzare (va alla velocità della camera)
+		// deciso da noi smette di avanzare (va alla velocità della camera)
 		// poi prosegue
 		switch (SubState)
 		{
@@ -147,11 +147,9 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 	case EWaveMode::EWM_Back:
 
 		// una volta che è arrivato a fondo schermo anche senza uscire
-
 		// una volta uscito dallo schermo in basso torna indietro 
 		// ed esce dalla parte alta
 		
-
 		switch (SubState)
 		{
 		case 0:
@@ -161,124 +159,79 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 			FVector CamLocation{ MyCamera->GetActorLocation() }; // memorizzo loc camera
 			        CamLocation.Z = GetActorLocation().Z;
 
-			FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * -100.f) };  // 400.f
+			FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * -400.f) };  // 400.f
 
-			double CamLoc{ Point.X };
-
-			DrawDebugSphere(GetWorld(), Point,34,20,FColor::Red);
-
-			double Dist{ abs( CamLoc - GetActorLocation().X) };
-			//+ Customf1
-			//UE_LOG(LogTemp, Error, TEXT("Dist = %f Custom = %f"), Dist, Customf1);
-
+			double Dist{ abs(Point.X - GetActorLocation().X) };
+	
 			if (Dist < Customf1)
 			{
 				SubState = 1;
-				//Vel = -MyCamera->GetVel();
-				//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
-				// memorizzo la mia rotazione 
-				//al momento di dover virarae
-				//StartRotation  = GetActorRotation();
-				//TargetRotation = StartRotation + FRotator(180, 0, 0);
-				
-				StartPitch = GetActorRotation().Pitch;
-				TargetPitch = StartPitch + 180;
-				//TargetRotation.is
-				Vel *= 2;
+				// Memorizzo l'orientamento iniziale 
+				// della nave
+				BaseOrientation = GetActorQuat();
 
+				// memorizzo il vettore attorno a cui ruotare
+				LoopAxis        = GetActorRightVector();
+				// dovrebbe già essere normalizzato
+				// ma me ne assicuro per non sbagliare
+				LoopAxis.Normalize();
+				// memorizzo punto iniziale di rotazione e finale in radianti
+				CurrentLoopAngle = 0;
+				TargetLoopAngle  = FMath::DegreesToRadians(-180);
+
+				//TargetRotation.is
+			
 			}
 
 		}
 		break; // avanza fino ad una certa distanza dal centro visuale
 
-
 		case 1:
+		{
+			// Angolo di rotazione continuo
+			//
 
-		/*
-			StartRotation = GetActorRotation();
+			// calcolo di quanto incremento la rotazione ogni frame
+			CurrentLoopAngle -= DeltaTime * FMath::DegreesToRadians(180);
 
-			if (FMath::IsNearlyEqual(StartPitch, TargetPitch, 2.f))
+			// se l'angolo attuale supera quello finale esco
+			if (CurrentLoopAngle <= TargetLoopAngle)
 			{
-				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"), Vel);
-				Vel *= 3;
+				CurrentLoopAngle = TargetLoopAngle;
+				Vel *= 8;
 				SubState = 2;
-				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"),Vel);
-				StartPitch = TargetPitch;
 			}
-			else
-			{
-				StartPitch += 360 * DeltaTime;
-				if (StartPitch > TargetPitch) StartPitch = TargetPitch;
+		
+			// gestione di cambio effettivo dell'orientamento
+			// tramite i Quat
 
+			// qui calcolo la mia posizione attorno al pitch
+			// non tiene in considerazione l'orientamento iniziale
+			// utilizzare direttamente questo risultato
+			// mi porterebbe sempre ad allinearmi all'asse Y 
+			// del mondo
+			FQuat LoopRotation{ LoopAxis,CurrentLoopAngle };
+			// calcolo l'orientamento complessivo
+			// per farlo con i quat, mi basta
+			// moltiplicare l'orientamento su un asse per quello 
+			//dello sguardo originale
+			FQuat FinalOrientation{ LoopRotation * BaseOrientation };
 
-			}
-			//StartRotation = FMath::RInterpConstantTo(StartRotation, TargetRotation, DeltaTime, 180.f);
-			//StartPitch = FMath::FInterpConstantTo(StartPitch, TargetPitch, DeltaTime, 180.f);
-			
-			StartPitch = FRotator::NormalizeAxis(StartPitch);
-			StartRotation.Pitch = StartPitch;
+			// assegno l'orientamento calcolato
+			SetActorRotation(FinalOrientation);
 
+			// non faccio avanzare sul forward la nave mentre ruota
+			// per non fargli cambiare altezza
+			//SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 
-
-			SetActorRotation(StartRotation);
-			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-			
-	     */
-
-		 // Angolo di rotazione continuo
-
-			if (FMath::IsNearlyEqual(StartPitch, TargetPitch, 2.f))
-			{
-				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"), Vel);
-				Vel *= 3;
-				SubState = 2;
-				//	UE_LOG(LogTemp, Error, TEXT("Loop completo %f vel dopo"),Vel);
-				StartPitch = TargetPitch;
-			}
-			else
-			{
-
-				StartPitch += DeltaTime * 180;
-
-				// Crea quaternione per rotazione sull'asse X (pitch)
-				FQuat PitchQuat = FQuat(FVector::RightVector, FMath::DegreesToRadians(StartPitch));
-
-				SetActorRotation(PitchQuat);
-			}
-			// Applica al componente
-		/*	USceneComponent* Root = GetRootComponent();
-			
-			if (Root)
-			{
-				SetActorRotation(,)
-
-				// Se vuoi mantenere altre rotazioni
-				FQuat CurrentRotation = Root->GetComponentQuat();
-				FQuat NewRotation = CurrentRotation * PitchQuat;
-				Root->SetWorldQuat(NewRotation);
-			}*/
-
-
-
-
-
-
-
-			//else { Vel = 400.f; SubState = 2; }
-
+		}
 		break; // sta fermo per un certo periodo (eventualmente spara)
 
 
 		case 2:
-
-			/*DrawDebugLine(GetWorld(),
-							GetActorLocation(), 
-							GetActorLocation() + GetActorForwardVector() * Vel, 
-					        FColor::Magenta , false,-1,5) ;*/
-
-			
-
+		{
 			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		}
 		break; // riprende ad avanzare e successivamente esce dallo schermo
 
 		}
@@ -289,14 +242,9 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 }
 
 
-
-
-
-
 // 
 void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName NewType)
 {
-	
 	//PrimaryActorTick.bCanEverTick = true;
 	StartLocation = SpawnLocation; // salvo locazione al momento di essere attivato
 

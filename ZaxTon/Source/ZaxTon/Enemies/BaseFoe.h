@@ -39,11 +39,22 @@ class ZAXTON_API ABaseFoe : public AActor
 
 	FVector StartLocation{ 0,0,0 }; // locazione iniziale
 
-	FRotator StartRotation{ 0,0,0 };
-	FRotator TargetRotation{ 0,0,0 };
+	// variabili per calcolo rotazioni in Quat
+	FQuat BaseOrientation; // memorizzo orientamento inziale 
+	// della nave , per poter mantenere la direzione
+	// durante il flip 
 
-	float StartPitch{ 0};
-	float TargetPitch{ 0 };
+	// per salvare asse (vettore) attorno a cui
+	// ruotare sfruttando i calcoli in Quat
+	FVector LoopAxis;
+
+	// angolo da cui iniziare a ruotare
+	float CurrentLoopAngle;
+	// angolo dove vogliamo arrivare
+	float TargetLoopAngle;
+	// entrambi da memorizzare subito in radianti
+
+
 	// set di variabili custom da utilizzare per diversi
 	// scopi a seconda del tipo di ondata
 	float Customf1{ 0.f }; // ampiezza curva	
