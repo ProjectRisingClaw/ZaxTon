@@ -161,7 +161,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 
 			FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * -400.f) };  // 400.f
 
-			double Dist{ abs(Point.X - GetActorLocation().X) };
+			double  Dist{ abs(Point.X - GetActorLocation().X) };
 	
 			if (Dist < Customf1)
 			{
@@ -170,17 +170,18 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 				// della nave
 				BaseOrientation = GetActorQuat();
 
+				UE_LOG(LogTemp, Error, TEXT(" Orient Quat = %s"), *BaseOrientation.ToString());
+
+				UE_LOG(LogTemp, Error, TEXT(" Orient Rot = %s"), *BaseOrientation.Rotator().ToString());
+
 				// memorizzo il vettore attorno a cui ruotare
-				LoopAxis        = GetActorRightVector();
+				LoopAxis        = GetActorForwardVector();
 				// dovrebbe già essere normalizzato
 				// ma me ne assicuro per non sbagliare
 				LoopAxis.Normalize();
 				// memorizzo punto iniziale di rotazione e finale in radianti
 				CurrentLoopAngle = 0;
-				TargetLoopAngle  = FMath::DegreesToRadians(-180);
-
-				//TargetRotation.is
-			
+				TargetLoopAngle  = FMath::DegreesToRadians(-180);		
 			}
 
 		}
@@ -189,16 +190,15 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 		case 1:
 		{
 			// Angolo di rotazione continuo
-			//
-
 			// calcolo di quanto incremento la rotazione ogni frame
-			CurrentLoopAngle -= DeltaTime * FMath::DegreesToRadians(180);
+			CurrentLoopAngle -= DeltaTime * FMath::DegreesToRadians(360);
 
 			// se l'angolo attuale supera quello finale esco
+			//0  -1 -2 -3     //-180
 			if (CurrentLoopAngle <= TargetLoopAngle)
 			{
 				CurrentLoopAngle = TargetLoopAngle;
-				Vel *= 8;
+				Vel     *= 8; //aumento la velocità di 8 volte per tornare indietro rapidamente
 				SubState = 2;
 			}
 		
@@ -225,7 +225,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 			//SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 
 		}
-		break; // sta fermo per un certo periodo (eventualmente spara)
+		break; 
 
 
 		case 2:
