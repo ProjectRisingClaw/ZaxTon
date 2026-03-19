@@ -60,10 +60,14 @@ class ZAXTON_API ABaseFoe : public AActor
 	float Customf1{ 0.f }; // ampiezza curva	
 	float Customf2{ 0.f }; // vel curva
 	float Customf3{ 0.f }; // utilizzo per gradi attuali
+	float Customf4{ 0.f };
+
 
 	int8  Customi1{ 0   }; //-128 + 128
 
 	uint8 SubState{ 0 }; // utilizzato per switch dei "sotto stati" di un singolo comportamento
+
+	bool  bCustomBool{ false };
 
 public:	
 

@@ -87,7 +87,6 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 		Loc.X -= Vel * DeltaTime;
 		Loc.Y = StartLocation.Y + Amp; // sommo sull'asse Y per ottenere effetto sinus
 
-
 		SetActorLocation(Loc);
 		/*FVector DLoc{Loc - BLoc};
 		SetActorRotation(DLoc.Rotation());*/
@@ -159,7 +158,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 			FVector CamLocation{ MyCamera->GetActorLocation() }; // memorizzo loc camera
 			        CamLocation.Z = GetActorLocation().Z;
 
-			FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * -400.f) };  // 400.f
+			FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * Customf2) };  // 400.f
 
 			double  Dist{ abs(Point.X - GetActorLocation().X) };
 	
@@ -170,18 +169,18 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 				// della nave
 				BaseOrientation = GetActorQuat();
 
-				UE_LOG(LogTemp, Error, TEXT(" Orient Quat = %s"), *BaseOrientation.ToString());
+				//UE_LOG(LogTemp, Error, TEXT(" Orient Quat = %s"), *BaseOrientation.ToString());
 
-				UE_LOG(LogTemp, Error, TEXT(" Orient Rot = %s"), *BaseOrientation.Rotator().ToString());
+				//UE_LOG(LogTemp, Error, TEXT(" Orient Rot = %s"), *BaseOrientation.Rotator().ToString());
 
 				// memorizzo il vettore attorno a cui ruotare
-				LoopAxis        = GetActorForwardVector();
+			//	LoopAxis        = GetActorForwardVector();
 				// dovrebbe già essere normalizzato
 				// ma me ne assicuro per non sbagliare
-				LoopAxis.Normalize();
+				//LoopAxis.Normalize();
 				// memorizzo punto iniziale di rotazione e finale in radianti
 				CurrentLoopAngle = 0;
-				TargetLoopAngle  = FMath::DegreesToRadians(-180);		
+				TargetLoopAngle  = FMath::DegreesToRadians(Customf3);
 			}
 
 		}
@@ -191,7 +190,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 		{
 			// Angolo di rotazione continuo
 			// calcolo di quanto incremento la rotazione ogni frame
-			CurrentLoopAngle -= DeltaTime * FMath::DegreesToRadians(360);
+			CurrentLoopAngle -= DeltaTime * FMath::DegreesToRadians(Customf4);
 
 			// se l'angolo attuale supera quello finale esco
 			//0  -1 -2 -3     //-180
@@ -222,8 +221,10 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 
 			// non faccio avanzare sul forward la nave mentre ruota
 			// per non fargli cambiare altezza
-			//SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-
+			if (bCustomBool)
+			{
+				SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel*3);
+			}
 		}
 		break; 
 
@@ -247,6 +248,9 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 {
 	//PrimaryActorTick.bCanEverTick = true;
 	StartLocation = SpawnLocation; // salvo locazione al momento di essere attivato
+	SetActorLocation(SpawnLocation);
+	SetActorRotation(SpawnRotation);
+
 
 	SubState = 0; // se serve gestire dei sotto stati, azzero l'indice dello switch interno 
 	// carico dati dalla DT
@@ -256,7 +260,16 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
 		ExplosionEffect =   MyRow->ExplosionFX; // copio valore VFX da Data table;
 		WaveMode        =   MyRow->WaveMode;
-		
+		                    MyRow->OrientVector;
+         
+		switch (MyRow->OrientVector)
+				{
+				case EOrientVector::EOV_Forward: LoopAxis = GetActorForwardVector();    break;
+				case EOrientVector::EOV_Right:   LoopAxis   = GetActorRightVector();    break;
+				case EOrientVector::EOV_Up:      LoopAxis      = GetActorUpVector();    break;			
+				}
+
+		LoopAxis.Normalize();
 		// a seconda del tipo di ondata inzializo i due valori custom
 		// in maniera differente
 		switch (WaveMode)
@@ -275,8 +288,12 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		break;
 
 		case EWaveMode::EWM_Back:
-		Customf1 = MyRow->CamDistance;
-		Customf2 = MyRow->Counter;
+		Customf1    = MyRow->CamDistance;
+		Customf2    = MyRow->CameraOffset;  
+		Customf3    = MyRow->AngleAmp;
+		Customf4    = MyRow->RotationSpeed;
+
+		bCustomBool = MyRow->bMoveWhileRotating;
 		break;
 
 
@@ -292,8 +309,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 	// nascondo grafica del proiettile
 	Body->SetHiddenInGame(false);
 	// posiziono l'oggetto in una zona lontana da quella di azione
-	SetActorLocation(SpawnLocation);
-	SetActorRotation(SpawnRotation);
+
 	//Durata = 1.5; // ripristino durata proiettile
 
 }
