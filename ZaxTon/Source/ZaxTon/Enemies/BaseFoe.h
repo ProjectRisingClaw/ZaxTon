@@ -96,4 +96,12 @@ public:
 
 	void UpdateLoc(float DeltaTime);
 
+	void WaveStraight(float DeltaTime);
+
+	void WaveSinus(float DeltaTime);
+
+	void WaveWait(float DeltaTime);
+
+	void WaveBack(float DeltaTime);
+
 };

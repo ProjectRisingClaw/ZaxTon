@@ -64,184 +64,194 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 {
 	switch (WaveMode)
 	{
-	case EWaveMode::EWM_Straight:
-		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-	break;
-
-	case EWaveMode::EWM_Sinus:
-	{
-		// customf3 qui mi serve per identificare i gradi
-		// se Customf2 vale 360 ci metterò 1 secondo a compiere un 
-		// oscillazione
-		Customf3 += Customf2 * DeltaTime;
-		//float Sin{ FMath::Sin(FMath::DegreesToRadians(Customf3)) };
-
-		float Sin{ MyGM->sinLUT[uint8(Customf3)] };
-		float Amp = Sin * Customf1;  // moltiplico il
-		// valore del seno (che sta tra -1 e 1) per una mia
-		// variabile che rappresenta la larghezza dell'oscillazione
-		// si muove seguendo una sinusoide
-		// posso decidere l'ampiezza
-		FVector Loc = GetActorLocation();
-		//	FVector BLoc{ Loc }; // memorizzo locazione prima di cambiarla
-		Loc.X -= Vel * DeltaTime;
-		Loc.Y = StartLocation.Y + Amp; // sommo sull'asse Y per ottenere effetto sinus
-
-		SetActorLocation(Loc);
-		/*FVector DLoc{Loc - BLoc};
-		SetActorRotation(DLoc.Rotation());*/
-
-		//float Seno = FMath::sin();
-		//SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-
-	}
-	break;
-
-	case EWaveMode::EWM_Wait:
-		// va dritto ma entrato nello schermo, per un tempo
-		// deciso da noi smette di avanzare (va alla velocità della camera)
-		// poi prosegue
-		switch (SubState)
-		{
-		case 0:
-		{
-			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-
-			double Dist{ abs(MyCamera->GetActorLocation().X - GetActorLocation().X) };
-			//+ Customf1
-			if (Dist < Customf1)
-			{
-				SubState = 1;
-				Vel = -MyCamera->GetVel();
-				//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
-			}
-
-		}
-		break; // avanza fino ad una certa distanza dal centro visuale
-		
-	
-		case 1:  
-
-			Customf2 -= DeltaTime;
-
-			if (Customf2  > 0)
-			{
-				SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-			}
-			else { Vel = 400.f; SubState = 2; }
-			
-		break; // sta fermo per un certo periodo (eventualmente spara)
-
-
-		case 2:  
-		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-		break; // riprende ad avanzare e successivamente esce dallo schermo
-
-		}
-		//MyGM->MyCamera;
-
-
-	break;
-
-	case EWaveMode::EWM_Back:
-
-		// una volta che è arrivato a fondo schermo anche senza uscire
-		// una volta uscito dallo schermo in basso torna indietro 
-		// ed esce dalla parte alta
-		
-		switch (SubState)
-		{
-		case 0:
-		{
-			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-
-			FVector CamLocation{ MyCamera->GetActorLocation() }; // memorizzo loc camera
-			        CamLocation.Z = GetActorLocation().Z;
-
-			FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * Customf2) };  // 400.f
-
-			double  Dist{ abs(Point.X - GetActorLocation().X) };
-	
-			if (Dist < Customf1)
-			{
-				SubState = 1;
-				// Memorizzo l'orientamento iniziale 
-				// della nave
-				BaseOrientation = GetActorQuat();
-
-				//UE_LOG(LogTemp, Error, TEXT(" Orient Quat = %s"), *BaseOrientation.ToString());
-
-				//UE_LOG(LogTemp, Error, TEXT(" Orient Rot = %s"), *BaseOrientation.Rotator().ToString());
-
-				// memorizzo il vettore attorno a cui ruotare
-			//	LoopAxis        = GetActorForwardVector();
-				// dovrebbe già essere normalizzato
-				// ma me ne assicuro per non sbagliare
-				//LoopAxis.Normalize();
-				// memorizzo punto iniziale di rotazione e finale in radianti
-				CurrentLoopAngle = 0;
-				TargetLoopAngle  = FMath::DegreesToRadians(Customf3);
-			}
-
-		}
-		break; // avanza fino ad una certa distanza dal centro visuale
-
-		case 1:
-		{
-			// Angolo di rotazione continuo
-			// calcolo di quanto incremento la rotazione ogni frame
-			CurrentLoopAngle -= DeltaTime * FMath::DegreesToRadians(Customf4);
-
-			// se l'angolo attuale supera quello finale esco
-			//0  -1 -2 -3     //-180
-			if (CurrentLoopAngle <= TargetLoopAngle)
-			{
-				CurrentLoopAngle = TargetLoopAngle;
-				Vel     *= 8; //aumento la velocità di 8 volte per tornare indietro rapidamente
-				SubState = 2;
-			}
-		
-			// gestione di cambio effettivo dell'orientamento
-			// tramite i Quat
-
-			// qui calcolo la mia posizione attorno al pitch
-			// non tiene in considerazione l'orientamento iniziale
-			// utilizzare direttamente questo risultato
-			// mi porterebbe sempre ad allinearmi all'asse Y 
-			// del mondo
-			FQuat LoopRotation{ LoopAxis,CurrentLoopAngle };
-			// calcolo l'orientamento complessivo
-			// per farlo con i quat, mi basta
-			// moltiplicare l'orientamento su un asse per quello 
-			//dello sguardo originale
-			FQuat FinalOrientation{ LoopRotation * BaseOrientation };
-
-			// assegno l'orientamento calcolato
-			SetActorRotation(FinalOrientation);
-
-			// non faccio avanzare sul forward la nave mentre ruota
-			// per non fargli cambiare altezza
-			if (bCustomBool)
-			{
-				SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel*3);
-			}
-		}
-		break; 
-
-
-		case 2:
-		{
-			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
-		}
-		break; // riprende ad avanzare e successivamente esce dallo schermo
-
-		}
-
-	break;
+	case EWaveMode::EWM_Straight: WaveStraight(DeltaTime); break;
+	case EWaveMode::EWM_Sinus:    WaveSinus(DeltaTime);    break;
+	case EWaveMode::EWM_Wait:     WaveWait(DeltaTime);     break;
+	case EWaveMode::EWM_Back:     WaveBack(DeltaTime);     break;
 
 	}
 }
 
+void ABaseFoe::WaveStraight(float DeltaTime)
+{
+	SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+}
+
+void ABaseFoe::WaveSinus(float DeltaTime)
+{
+
+	// customf3 qui mi serve per identificare i gradi
+	// se Customf2 vale 360 ci metterò 1 secondo a compiere un 
+	// oscillazione
+	Customf3 += Customf2 * DeltaTime;
+	//float Sin{ FMath::Sin(FMath::DegreesToRadians(Customf3)) };
+
+	float Sin{ MyGM->sinLUT[uint8(Customf3)] };
+	float Amp = Sin * Customf1;  // moltiplico il
+	// valore del seno (che sta tra -1 e 1) per una mia
+	// variabile che rappresenta la larghezza dell'oscillazione
+	// si muove seguendo una sinusoide
+	// posso decidere l'ampiezza
+	FVector Loc = GetActorLocation();
+	//	FVector BLoc{ Loc }; // memorizzo locazione prima di cambiarla
+	Loc.X -= Vel * DeltaTime;
+	Loc.Y = StartLocation.Y + Amp; // sommo sull'asse Y per ottenere effetto sinus
+
+	SetActorLocation(Loc);
+	/*FVector DLoc{Loc - BLoc};
+	SetActorRotation(DLoc.Rotation());*/
+
+	//float Seno = FMath::sin();
+	//SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+}
+
+void ABaseFoe::WaveWait(float DeltaTime)
+{
+	// va dritto ma entrato nello schermo, per un tempo
+	// deciso da noi smette di avanzare (va alla velocità della camera)
+	// poi prosegue
+	switch (SubState)
+	{
+	case 0:
+	{
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+		double Dist{ abs(MyCamera->GetActorLocation().X - GetActorLocation().X) };
+		//+ Customf1
+		if (Dist < Customf1)
+		{
+			SubState = 1;
+			Vel = -MyCamera->GetVel();
+			//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
+		}
+
+	}
+	break; // avanza fino ad una certa distanza dal centro visuale
+
+
+	case 1:
+
+		Customf2 -= DeltaTime;
+
+		if (Customf2  > 0)
+		{
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		}
+		else { Vel = 400.f; SubState = 2; }
+
+		break; // sta fermo per un certo periodo (eventualmente spara)
+
+
+	case 2:
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		break; // riprende ad avanzare e successivamente esce dallo schermo
+
+	}
+	//MyGM->MyCamera;
+}
+
+void ABaseFoe::WaveBack(float DeltaTime)
+{
+	// una volta che è arrivato a fondo schermo anche senza uscire
+	// una volta uscito dallo schermo in basso torna indietro 
+	// ed esce dalla parte alta
+
+	switch (SubState)
+	{
+	case 0:
+	{
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+		FVector CamLocation{ MyCamera->GetActorLocation() }; // memorizzo loc camera
+		CamLocation.Z = GetActorLocation().Z;
+
+		FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * Customf2) };  // 400.f
+
+		double  Dist{ abs(Point.X - GetActorLocation().X) };
+
+		if (Dist < Customf1)
+		{
+			SubState = 1;
+			// Memorizzo l'orientamento iniziale 
+			// della nave
+			BaseOrientation = GetActorQuat();
+
+			//UE_LOG(LogTemp, Error, TEXT(" Orient Quat = %s"), *BaseOrientation.ToString());
+			//UE_LOG(LogTemp, Error, TEXT(" Orient Rot = %s"), *BaseOrientation.Rotator().ToString());
+			// memorizzo il vettore attorno a cui ruotare
+			//LoopAxis        = GetActorForwardVector();
+			// dovrebbe già essere normalizzato
+			// ma me ne assicuro per non sbagliare
+			//LoopAxis.Normalize();
+			// memorizzo punto iniziale di rotazione e finale in radianti
+			CurrentLoopAngle = 0;
+			TargetLoopAngle = FMath::DegreesToRadians(Customf3);
+		}
+
+	}
+	break; // avanza fino ad una certa distanza dal centro visuale
+
+	case 1:
+	{
+		// Angolo di rotazione continuo
+		// calcolo di quanto incremento la rotazione ogni frame
+
+		// se l'angolo attuale supera quello finale esco
+		//0  -1 -2 -3     //-180
+
+		if (TargetLoopAngle > 0)  // se maggiore di zero la nave ruota alla sua sinistra 
+		{
+			CurrentLoopAngle += DeltaTime * FMath::DegreesToRadians(Customf4);
+			if (CurrentLoopAngle >= TargetLoopAngle)
+			{
+				CurrentLoopAngle = TargetLoopAngle;
+				Vel *= 8; //aumento la velocità di 8 volte per tornare indietro rapidamente
+				SubState = 2;
+			}
+		}
+		else
+		{
+			CurrentLoopAngle -= DeltaTime * FMath::DegreesToRadians(Customf4);
+			if (CurrentLoopAngle <= TargetLoopAngle)
+			{
+				CurrentLoopAngle = TargetLoopAngle;
+				Vel *= 8; //aumento la velocità di 8 volte per tornare indietro rapidamente
+				SubState = 2;
+			}
+		}
+		// gestione di cambio effettivo dell'orientamento
+		// tramite i Quat
+
+		// qui calcolo la mia posizione attorno al pitch
+		// non tiene in considerazione l'orientamento iniziale
+		// utilizzare direttamente questo risultato
+		// mi porterebbe sempre ad allinearmi all'asse Y 
+		// del mondo
+		FQuat LoopRotation{ LoopAxis,CurrentLoopAngle };
+		// calcolo l'orientamento complessivo
+		// per farlo con i quat, mi basta
+		// moltiplicare l'orientamento su un asse per quello 
+		//dello sguardo originale
+		FQuat FinalOrientation{ LoopRotation * BaseOrientation };
+
+		// assegno l'orientamento calcolato
+		SetActorRotation(FinalOrientation);
+
+		// non faccio avanzare sul forward la nave mentre ruota
+		// per non fargli cambiare altezza
+		if (bCustomBool)
+		{
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel * 3);
+		}
+	}
+	break;
+
+	case 2:
+	{ SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel); }
+	break; // riprende ad avanzare e successivamente esce dallo schermo
+
+	}
+}
 
 // 
 void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName NewType)
@@ -264,9 +274,9 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
          
 		switch (MyRow->OrientVector)
 				{
-				case EOrientVector::EOV_Forward: LoopAxis = GetActorForwardVector();    break;
+				case EOrientVector::EOV_Forward: LoopAxis   = GetActorForwardVector();  break;
 				case EOrientVector::EOV_Right:   LoopAxis   = GetActorRightVector();    break;
-				case EOrientVector::EOV_Up:      LoopAxis      = GetActorUpVector();    break;			
+				case EOrientVector::EOV_Up:      LoopAxis   = GetActorUpVector();       break;			
 				}
 
 		LoopAxis.Normalize();
