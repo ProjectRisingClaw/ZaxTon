@@ -8,7 +8,10 @@
 #include "EngineUtils.h" // per poter utilizzare gli iteratori
 #include "PCamera.h"     // includo l'oggetto a cui passare la visuale
 #include "GameFramework/PlayerInput.h" // per selezione tasti input
+#include "ZaxTon/Effects/Explosion.h"
 #include "PBullet.h"
+#include "../Enemies/BaseFoe.h"
+#include "ZaxTon/ZaxMode.h"
 
 // funzione di init input
 static void InitDefaultKeys()
@@ -53,23 +56,49 @@ APShip::APShip()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
 
+	auto Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
+
+	MyDT = LoadObject<UDataTable>(nullptr, Path);
+
+	FPlayerTableRaw* MyRow{ MyDT->FindRow<FPlayerTableRaw>(FName("PlayerA"),TEXT("Context")) };
+
+	if (MyRow) {
+
+		UE_LOG(LogTemp, Error, TEXT("Entro nella data Table"));
+
+
+		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
+		ExplosionEffect = MyRow->ExplosionFX;
+		Collision->SetSphereRadius(64);
+		Collision->SetHiddenInGame(false);
+		//Body->SetStaticMesh(MyMesh);
+		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+		Body->CastShadow = false;
+	}
+
 	//auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01.SM_StarSparrow01'"); // funziona ugualmente ma non più necessario
-	auto Path = TEXT("/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01");
+	//auto Path = TEXT("/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01");
 	//auto Path = TEXT("SM_StarSparrow01");
 	// 
 	// per sicurezza (ad esempio aver dato un path sbagliato) controllo con un cast
 	// che il puntatore restituito sia effettivamente a StaticMesh
 
 
-	auto MyMesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),  // tipo dell'oggetto da trovare
-		nullptr,                                  // riferimeto ad oggetto se serve
-		Path));
+	//auto MyMesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),  // tipo dell'oggetto da trovare
+		//nullptr,                                  // riferimeto ad oggetto se serve
+		//Path));
+
+	
+
+	 // recupero la DT tramite Path
+	// vado a trovare la riga che mi interessa sulla DT
+	
 
 	                               // path dell'asset
-	if (MyMesh)
+	/*if (MyMesh)
 	{
 		Collision->SetSphereRadius(64);
-		Collision->SetHiddenInGame(true); 
+		Collision->SetHiddenInGame(false); 
 		Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
 		Body->CastShadow = false;
@@ -77,8 +106,7 @@ APShip::APShip()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT(" no mesh "));
-	}
-
+	}*/
 }
 
 // Called when the game starts or when spawned
@@ -115,7 +143,15 @@ void APShip::BeginPlay()
 		ugo += 2;
 	}
 
+	Collision->OnComponentBeginOverlap.AddDynamic(this, &APShip::ColpitoFromFOE);
 
+	auto Path = TEXT("/Game/GrenadePack/Niagara/NS_ExplosionA.NS_ExplosionA");
+
+	ExplosionEffect = Cast<UNiagaraSystem>(StaticLoadObject(UNiagaraSystem::StaticClass(),  // tipo dell'oggetto da trovare
+		nullptr,                                  // riferimeto ad oggetto se serve
+		Path));
+
+	MyGM = Cast<AZaxMode>(GetWorld()->GetAuthGameMode());
 
 	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
 	{
@@ -135,10 +171,15 @@ void APShip::BeginPlay()
 			// dovrà essere mantenuta
 			CamOffset.Z = GetActorLocation().Z - MyCamera->GetActorLocation().Z;
 
+			PosizioneZ = GetActorLocation().Z;
 
 			return;
 		}
 	}
+
+	
+	
+
 	
 }
 
@@ -233,7 +274,15 @@ void APShip::ManageMove(float DeltaTime)
 	
 	// la nuova locazione sarà uguale alla posizione della camera + lo
 	// scarto attuale
-	SetActorLocation(MyCamera->GetActorLocation() + CamOffset,true);
+	if(!death)
+		SetActorLocation(MyCamera->GetActorLocation() + CamOffset,true);
+	else {
+		//SetActorLocation(MyCamera->GetActorLocation(), true);
+		SetActorLocation(FVector(MyCamera->GetActorLocation().X, MyCamera->GetActorLocation().Y, CamOffset.Z),true);
+		CamOffset = FVector(0,0,CamOffset.Z);
+		death = false;
+	}
+
 
 	//FVector Position{ GetActorLocation() }; // salvo posizione attuale
 	// creo vettore temporaneo utilizzando i valori 
@@ -260,6 +309,54 @@ void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void APShip::ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (Cast<ABaseFoe>(OtherActor))
+	{
+		ABaseFoe* Nemico = Cast<ABaseFoe>(OtherActor);
+
+		if (numVit > 0) {
+			numVit--;
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Finito Vite :["));
+		}
+		Nemico->SpawnDieEffect();
+		Nemico->DeActivate();
+
+		//SetActorLocation(CamOffset);
+		death = true;
+		SpawnDieEffect();
+		Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn,this,&APShip::Respawn,0.1,false);
+	}
+
+}
+
+void APShip::Respawn()
+{
+	if (invs) {
+		Body->SetHiddenInGame(false);
+		invs = false;
+		sec++;
+	}
+	else {
+		Body->SetHiddenInGame(true);
+		invs = true;
+		sec++;
+	}
+
+
+	if (sec < 20) {
+		
+		GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn, this, &APShip::Respawn, 0.1, false);
+	}
+	else {
+		Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		sec = 0;
+	}
+}
+
 // nelle funzioni input semplicemente memorizzo l'ultimo valore
 void  APShip::MoveForward(float Input)
 {
@@ -270,5 +367,20 @@ void  APShip::MoveForward(float Input)
 void  APShip::MoveRight(float Input)
 { 
 	left = Input; 	
+}
+
+void APShip::SpawnDieEffect()
+{
+	if (!ExplosionEffect) return; // controllo di sicurezza se non ho definito il particellare esco
+
+	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExplosionEffect,GetActorLocation());
+
+	//auto MyGM{ Cast<AZaxMode>(GetOwner()) };
+	if (MyGM)
+	{
+		auto NewEffect{ MyGM->AvailableEffects.Pop() };
+		if (!NewEffect) return;
+		NewEffect->Activate(GetActorLocation(), FRotator(0), ExplosionEffect);
+	}
 }
 

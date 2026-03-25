@@ -10,7 +10,9 @@
 class APBullet; // forward declaration per bullet, dato che lo includo solo nel cpp
 class USphereComponent;
 class APCamera;
-
+class UNiagaraSystem;
+class AZaxMode;
+class UDataTable;
 
 UCLASS()
 class ZAXTON_API APShip : public APawn
@@ -26,6 +28,10 @@ class ZAXTON_API APShip : public APawn
 
 	USphereComponent* Collision{ nullptr };
 
+	UNiagaraSystem* ExplosionEffect{ nullptr };
+
+	UDataTable* MyDT{ nullptr };
+
 	// funzioni gestione movimento
 	void  MoveForward(float Input);
 
@@ -39,6 +45,7 @@ class ZAXTON_API APShip : public APawn
 	float left { 0 };
 	float front{ 0 };
 
+	FTimerHandle FtimerHandleRespawn;
 
 	UPROPERTY(EditAnyWhere)
 	float Vel{ 1200.f }; // velocità della nave
@@ -56,6 +63,13 @@ class ZAXTON_API APShip : public APawn
 
 	float FireTime{ 0.f }; // variabile counter , in sostituzione di un eventuale timer di unreal
 
+	int numVit{ 3 };
+	int sec{ 0 };
+	bool invs{ false };
+	bool death{ false };
+
+	float PosizioneZ{ 0.f };
+
 	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
 	// mi serve un handle per poter spegnere il timer al momento del rilascio
 public:
@@ -69,6 +83,8 @@ public:
 	// vettore che determina lo scarto tra la posizione della nave e l'actor usato
 	//vome camera. Se l'offset è 0 0 0 significa che la nave è nella stessa posizione della camera
 	FVector CamOffset{ 0,0,0 };
+
+	AZaxMode* MyGM{ nullptr };
 
 	// puntatore per memorizzare riferimento all'oggetto usato
 	//come punto di vista 
@@ -90,5 +106,12 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	void ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void Respawn();
+
+	void SpawnDieEffect();
 
 };

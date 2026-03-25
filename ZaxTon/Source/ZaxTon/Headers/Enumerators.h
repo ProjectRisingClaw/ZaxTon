@@ -13,6 +13,17 @@ enum class EEnemyType : uint8
 
 };
 
+UENUM(BlueprintType)
+enum class EPlayerType : uint8
+{
+	EET_PlayerA UMETA(DisplayName = "Player A"),
+	EET_PlayerB UMETA(DisplayName = "Player B"),
+	EET_PlayerC UMETA(DisplayName = "Player C"),
+	EET_PlayerD UMETA(DisplayName = "Player D"),
+	EET_MAX     UMETA(DisplayName = "MAX")
+
+};
+
 
 UENUM(BlueprintType)
 enum class EWaveMode : uint8

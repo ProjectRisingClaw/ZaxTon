@@ -62,3 +62,15 @@ struct FEnemyTableRaw : public FTableRowBase
 	float RotationSpeed{ 360.f };
 
 };
+
+USTRUCT(BlueprintType)
+struct FPlayerTableRaw: public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UStaticMesh* Mesh{ nullptr };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UNiagaraSystem* ExplosionFX{ nullptr };
+};
