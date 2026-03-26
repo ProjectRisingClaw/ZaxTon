@@ -342,7 +342,7 @@ void ABaseFoe::SpawnDieEffect()
 
 void ABaseFoe::DeActivate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("chiamo deactive"))
+	//UE_LOG(LogTemp, Warning, TEXT("chiamo deactive"))
 
 	// disattivo collisione proiettile 
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);

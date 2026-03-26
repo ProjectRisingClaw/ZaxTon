@@ -12,6 +12,7 @@
 #include "PBullet.h"
 #include "../Enemies/BaseFoe.h"
 #include "ZaxTon/ZaxMode.h"
+#include "Kismet/GameplayStatics.h"  // libreria funzioni per il gameplay
 
 // funzione di init input
 static void InitDefaultKeys()
@@ -64,13 +65,14 @@ APShip::APShip()
 
 	if (MyRow) {
 
-		UE_LOG(LogTemp, Error, TEXT("Entro nella data Table"));
+		//UE_LOG(LogTemp, Error, TEXT("Entro nella data Table"));
 
 
 		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
 		ExplosionEffect = MyRow->ExplosionFX;
+		Vel             = MyRow->Vel;
 		Collision->SetSphereRadius(64);
-		Collision->SetHiddenInGame(false);
+		Collision->SetHiddenInGame(true);
 		//Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
 		Body->CastShadow = false;
@@ -113,7 +115,6 @@ APShip::APShip()
 void APShip::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	// inizializzo il mio array "pool"
 	// creao 15 proiettili e li inserisco tra quelli disponibili per essere sparati
 	for (int i = 0; i < 15; i++)
@@ -123,33 +124,19 @@ void APShip::BeginPlay()
 		bull->SetOwner(this); // come creo il proiettile
 		// gli lascio un riferimento all'oggetto che lo ha creato
 		bull->DeActivate(); // disattivo istanza
-	
-		//Available.AddUnique(bull); // inserisco in array dei disponibili.
 	}
 	
 	// il fire rate messo come vaolre iniziale si intende in 
 	// proiettil ial secondo. qui lo ricaloclolo come 1/ numero di proiettili
 	FireRate = 1 / FireRate;
 
-	// Arg1: inizializzo un array di puntatori con lista di oggetti del tipo desiderato 
-	// Arg2: il nome dell'array, diventa falso quando l'array è finito
-	// Arg3: incremento passo all'elemento successivo dell'array
-
-
-	int ugo = 0;
-
-	for (int i = 0; i < 25; i++)
-	{
-		ugo += 2;
-	}
-
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &APShip::ColpitoFromFOE);
 
-	auto Path = TEXT("/Game/GrenadePack/Niagara/NS_ExplosionA.NS_ExplosionA");
+	/*auto Path = TEXT("/Game/GrenadePack/Niagara/NS_ExplosionA.NS_ExplosionA");
 
 	ExplosionEffect = Cast<UNiagaraSystem>(StaticLoadObject(UNiagaraSystem::StaticClass(),  // tipo dell'oggetto da trovare
-		nullptr,                                  // riferimeto ad oggetto se serve
-		Path));
+		nullptr,           
+		Path));*/ // rimosso perchè adesso caricato dalla Data Table
 
 	MyGM = Cast<AZaxMode>(GetWorld()->GetAuthGameMode());
 
@@ -164,23 +151,14 @@ void APShip::BeginPlay()
 			MyController->SetViewTargetWithBlend(MyCamera, 1.f);
 			// primo argomento, oggetto a cui voglio passare la visuale
 			// secondo argomento, in quanto tempo
-
-
 			// memorizzo la distanza iniziale in z tra spawn point della nave
 			// e oggetto camera, questa distanza (salvo necessita di gameplay)
 			// dovrà essere mantenuta
 			CamOffset.Z = GetActorLocation().Z - MyCamera->GetActorLocation().Z;
-
 			PosizioneZ = GetActorLocation().Z;
-
 			return;
 		}
 	}
-
-	
-	
-
-	
 }
 
 // Called every frame
@@ -189,14 +167,10 @@ void APShip::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	ManageMove(DeltaTime);
-	
 	ManageFire(DeltaTime);
 
 	for (int i = 0; i < InUse.Num(); i++)
-	{
-		InUse[i]->UpdateLoc(DeltaTime);
-	}
-
+	{InUse[i]->UpdateLoc(DeltaTime);}
 
 }
 
@@ -256,6 +230,8 @@ void APShip::ManageMove(float DeltaTime)
 
 void APShip::ManageMove(float DeltaTime)
 {
+	if (death) return;
+
 	FVector Direction{ front,left,0 };
 	Direction.Normalize(); // normalizzo il vettore portandol oa dimensione 1
 
@@ -274,14 +250,8 @@ void APShip::ManageMove(float DeltaTime)
 	
 	// la nuova locazione sarà uguale alla posizione della camera + lo
 	// scarto attuale
-	if(!death)
-		SetActorLocation(MyCamera->GetActorLocation() + CamOffset,true);
-	else {
-		//SetActorLocation(MyCamera->GetActorLocation(), true);
-		SetActorLocation(FVector(MyCamera->GetActorLocation().X, MyCamera->GetActorLocation().Y, CamOffset.Z),true);
-		CamOffset = FVector(0,0,CamOffset.Z);
-		death = false;
-	}
+
+	SetActorLocation(MyCamera->GetActorLocation() + CamOffset,true);
 
 
 	//FVector Position{ GetActorLocation() }; // salvo posizione attuale
@@ -311,49 +281,55 @@ void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void APShip::ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	
+
 	if (Cast<ABaseFoe>(OtherActor))
 	{
-		ABaseFoe* Nemico = Cast<ABaseFoe>(OtherActor);
-
-		if (numVit > 0) {
-			numVit--;
-		}
-		else {
-			UE_LOG(LogTemp, Error, TEXT("Finito Vite :["));
-		}
-		Nemico->SpawnDieEffect();
-		Nemico->DeActivate();
-
-		//SetActorLocation(CamOffset);
+	
 		death = true;
 		SpawnDieEffect();
+	
+			numVit--;
+			SetActorLocation(FVector(MyCamera->GetActorLocation().X, MyCamera->GetActorLocation().Y, CamOffset.Z), true);
+			CamOffset = FVector(0, 0, CamOffset.Z);
+	
+		//SetActorLocation(CamOffset);
+		//death = true;
+		
 		Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn,this,&APShip::Respawn,0.1,false);
+		invs = true;
+		Body->SetHiddenInGame(invs);
+
+		GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn,this,&APShip::Respawn,0.5);
 	}
 
 }
 
 void APShip::Respawn()
 {
-	if (invs) {
-		Body->SetHiddenInGame(false);
-		invs = false;
-		sec++;
-	}
-	else {
-		Body->SetHiddenInGame(true);
-		invs = true;
-		sec++;
-	}
 
+	if (numVit > 0)
+	{
+		death = false;
+		invs  = !invs;
+		Body->SetHiddenInGame(invs);
+		sec++;
 
-	if (sec < 20) {
-		
-		GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn, this, &APShip::Respawn, 0.1, false);
+		if (sec < 20) {
+
+			GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn, this, &APShip::Respawn, 0.1);
+		}
+		else {
+
+			Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			Body->SetHiddenInGame(false);
+			sec = 0;
+		}
 	}
-	else {
-		Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		sec = 0;
+	else
+	{ // level restart
+		UGameplayStatics::OpenLevel(GetWorld(), FName("LevelTest"));
+
 	}
 }
 
@@ -371,16 +347,15 @@ void  APShip::MoveRight(float Input)
 
 void APShip::SpawnDieEffect()
 {
-	if (!ExplosionEffect) return; // controllo di sicurezza se non ho definito il particellare esco
 
-	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExplosionEffect,GetActorLocation());
+	if (!ExplosionEffect) { UE_LOG(LogTemp, Error, TEXT("missing"));  return; }// controllo di sicurezza se non ho definito il particellare esco
 
-	//auto MyGM{ Cast<AZaxMode>(GetOwner()) };
 	if (MyGM)
 	{
 		auto NewEffect{ MyGM->AvailableEffects.Pop() };
-		if (!NewEffect) return;
+		if (!NewEffect) { return; }
 		NewEffect->Activate(GetActorLocation(), FRotator(0), ExplosionEffect);
 	}
+
 }
 

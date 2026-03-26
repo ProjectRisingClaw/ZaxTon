@@ -65,7 +65,7 @@ class ZAXTON_API APShip : public APawn
 
 	int numVit{ 3 };
 	int sec{ 0 };
-	bool invs{ false };
+	bool invs{ true };
 	bool death{ false };
 
 	float PosizioneZ{ 0.f };

@@ -73,4 +73,8 @@ struct FPlayerTableRaw: public FTableRowBase
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	UNiagaraSystem* ExplosionFX{ nullptr };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Vel{ 1200.f };
+
 };

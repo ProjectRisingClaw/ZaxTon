@@ -51,7 +51,7 @@ void AZaxMode::BeginPlay()
 			Effect->DeActivate(); 
 			//AvailableEffects.AddUnique(Effect);
 
-		    UE_LOG(LogTemp, Error, TEXT("Av Effects %i"), AvailableEffects.Num());
+		  //  UE_LOG(LogTemp, Error, TEXT("Av Effects %i"), AvailableEffects.Num());
 		}
 
 	}

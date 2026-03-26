@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "PCamera.generated.h"
 
+class UCameraComponent;
+
+
 UCLASS()
 class ZAXTON_API APCamera : public AActor
 {
@@ -13,6 +16,10 @@ class ZAXTON_API APCamera : public AActor
 	
 
 	UStaticMeshComponent* Body{ nullptr };
+
+	UPROPERTY(VisibleAnyWhere, Category = "Camera")
+	UCameraComponent* Camera{ nullptr };
+
 
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* TriggerBox{ nullptr };
