@@ -46,3 +46,17 @@ enum class EOrientVector : uint8
 	EOV_MAX     UMETA(DisplayName = "MAX")
 
 };
+
+
+UENUM(BlueprintType)
+enum class EBulletKind : uint8
+{
+
+	EBK_Normal   UMETA(DisplayName = "Normal"), // un proiettile semplice che va dritto
+	EBK_Follow   UMETA(DisplayName = "Follow"), // un proiettile che insegue il nemico più vicino
+	EBK_Spiral   UMETA(DisplayName = "Spiral"), // un proiettile lento con traiettoria a spirale
+	EBK_Laser    UMETA(DisplayName = "Laser"), // un fascio di tipo line trace, che colpisce per tutta un linea
+	EBK_Spread   UMETA(DisplayName = "Spread"), // proiettili che si dirigono in varie direzioni
+	EBK_MAX      UMETA(DisplayName = "MAX")
+
+};

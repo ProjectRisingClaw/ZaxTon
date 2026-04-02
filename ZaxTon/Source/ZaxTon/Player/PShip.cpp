@@ -10,7 +10,8 @@
 #include "GameFramework/PlayerInput.h" // per selezione tasti input
 #include "ZaxTon/Effects/Explosion.h"
 #include "PBullet.h"
-#include "../Enemies/BaseFoe.h"
+#include "ZaxTon/Enemies/BaseFoe.h"
+#include "ZaxTon/Enemies/EBullet.h"
 #include "ZaxTon/ZaxMode.h"
 #include "Kismet/GameplayStatics.h"  // libreria funzioni per il gameplay
 
@@ -36,6 +37,12 @@ static void InitDefaultKeys()
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Fire", EKeys::SpaceBar));
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Fire", EKeys::Gamepad_FaceButton_Bottom));
 
+
+	// tasto per l'attacco speciale (soloa ad energia massima)
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::RightMouseButton));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::LeftShift));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::Gamepad_LeftTrigger));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::Gamepad_RightTrigger));
 }
 
 
@@ -276,14 +283,39 @@ void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	InputComponent->BindAction("Fire", EInputEvent::IE_Pressed, this, &APShip::FireBullet);
 	InputComponent->BindAction("Fire", EInputEvent::IE_Released, this, &APShip::FireBulletRelease);
 	//GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass(),,)
+	InputComponent->BindAction("Special", EInputEvent::IE_Pressed, this, &APShip::SpecialBullet);
+}
+
+
+void APShip::SpecialBullet()
+{
+	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 }; // trovo posizione spawn
+	//classe  // riferimento uclass    // locazione   // rotazione di spawn
+	//GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass(), SpawnLocation, GetActorRotation());
+
+	// per eseguire spawn dalla pool controllo che ci siano elementi disponibili e 
+	// nel caso li attivo posizionandoli nella locazione giusta
+
+	if (Available.Num() > 0) // se c'è almeno un elemento
+	{
+		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
+		NewBull->Activate(SpawnLocation, GetActorRotation(),"SpecialBullet"); // attivo oggetto posizionandolo
+		// nella locazione desiderata
+		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+
+
+	}
 
 }
+
+
 
 void APShip::ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
-
-	if (Cast<ABaseFoe>(OtherActor))
+	// nel caso di hit da corpo di un nemico o proiettile
+	// ricevo lo stesso danno 
+	if (Cast<ABaseFoe>(OtherActor) || Cast<AEBullet>(OtherActor))
 	{
 	
 		death = true;

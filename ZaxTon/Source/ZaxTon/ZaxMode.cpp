@@ -6,6 +6,7 @@
 #include "Effects/Explosion.h"
 #include "Player/PCamera.h"
 #include "EngineUtils.h" // per iteratore
+#include "ZaxTon/Enemies/EBullet.h"
 
 /*
 void AZaxMode::StartPlay()
@@ -56,6 +57,19 @@ void AZaxMode::BeginPlay()
 
 	}
 
+	for (int i = 0; i < 100; i++) // creo tutti i proiettili per i nemici
+	{
+		AEBullet* Bullet{ GetWorld()->SpawnActor<AEBullet>(AEBullet::StaticClass()) };
+
+		if (Bullet) // se è stato creato lo disattivo inserendolo nell'array
+		{
+			Bullet->MyGM = this;
+			Bullet->DeActivate(); // disattiva e inserisce in array dei disponibili
+
+		}
+
+
+	}
 
 }
 
@@ -63,9 +77,16 @@ void AZaxMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//aggiorno posizioni per i nemici
 	for (int i = 0; i < InUse.Num(); i++)
 	{
 		InUse[i]->UpdateLoc(DeltaTime);
+	}
+
+	// agiorno posizioni proiettili nemici
+	for (int i = 0; i < InUseEBullet.Num(); i++)
+	{
+		InUseEBullet[i]->UpdateLoc(DeltaTime);
 	}
 
 }

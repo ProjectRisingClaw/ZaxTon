@@ -5,7 +5,8 @@
 #include "PShip.h" // altrimenti non posso utilizzare variabili e funzioni di questa classe
 #include "ZaxTon/Enemies/BaseFoe.h" // includo il nemico per poterlo colpire
 #include "Components/SphereComponent.h"
-
+#include "ZaxTon/Headers/DataTables.h" 
+#include "ZaxTon/Headers/Enumerators.h"
 // Sets default values
 APBullet::APBullet()
 {
@@ -21,6 +22,11 @@ APBullet::APBullet()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
 
+	
+	auto Path = TEXT("/Game/DataTables/BPPlayerBulletTable");
+	MyDT = LoadObject<UDataTable>(nullptr, Path); // recupero la DT tramite Path
+
+	/*
 	//memorizzo in una variabile il path dell'asset
 	auto Path = TEXT("StaticMesh'/Engine/VREditor/TransformGizmo/SM_Sequencer_Node.SM_Sequencer_Node'");
 
@@ -35,13 +41,27 @@ APBullet::APBullet()
 		Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(3));
 	}
-
+	*/
 
 }
 
 // 
-void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation)
+void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName AttackType)
 {
+
+	// controlla la riga della tabella e carica dati
+
+	FPBulletTableRaw* MyRow{ MyDT->FindRow<FPBulletTableRaw>(AttackType,TEXT("Context")) };
+
+	if (MyRow) // ad ogni activate carico dati dalla tabella
+	{
+
+		Body->SetStaticMesh(MyRow->Mesh);
+		Body->SetRelativeScale3D(FVector(MyRow->Scale));
+		Vel = MyRow->Vel;
+
+	}
+
 	// disattivo collisione proiettile 
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 

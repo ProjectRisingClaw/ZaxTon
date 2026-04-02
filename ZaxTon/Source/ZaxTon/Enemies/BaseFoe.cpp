@@ -8,7 +8,7 @@
 #include "ZaxTon/Effects/Explosion.h"
 #include "ZaxTon/Player/PCamera.h" 
 #include "EngineUtils.h"
-
+#include "EBullet.h"
 // Sets default values
 ABaseFoe::ABaseFoe()
 {
@@ -121,7 +121,7 @@ void ABaseFoe::WaveWait(float DeltaTime)
 		if (Dist < Customf1)
 		{
 			SubState = 1;
-			Vel = -MyCamera->GetVel();
+			Vel = -MyCamera->GetVel(); // velocità uguale e contraria alla camera
 			//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
 		}
 
@@ -129,17 +129,41 @@ void ABaseFoe::WaveWait(float DeltaTime)
 	break; // avanza fino ad una certa distanza dal centro visuale
 
 
-	case 1:
+	case 1: // in questo stato è fermo ed è qui che dovrà sparare
 
+		// scala il tempo in cui stare fermo
 		Customf2 -= DeltaTime;
 
 		if (Customf2  > 0)
-		{
+		{   // si mette in lock con la camera
 			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 		}
-		else { Vel = 400.f; SubState = 2; }
+		else { Vel = 400.f; SubState = 2; } // assegno nuovamente velcoita in avanti
 
-		break; // sta fermo per un certo periodo (eventualmente spara)
+		// gestione spawn dei proiettili ( se ci sono proiettili )
+
+		if (Customui1 <= 0) break;
+
+		if (Counter > 0) Counter -= DeltaTime;
+		else
+		{		
+				
+				if (MyGM->AvailableEBullet.Num() > 0)
+				{
+					AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
+					FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
+
+					NewBull->Activate(SpawnLocation, GetActorRotation(), BulletName);
+					MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
+				}
+
+			Customui1 -= 1;
+
+		
+			Counter    = Customf3; // rimetto il contaatore alla dimensione del Dealy
+		}
+
+	break; // sta fermo per un certo periodo (eventualmente spara)
 
 
 	case 2:
@@ -294,7 +318,22 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 
 		case EWaveMode::EWM_Wait:
 		Customf1 = MyRow->CamDistance;
-		Customf2 = MyRow->Counter;
+		Customf2 = MyRow->EnemyDelay;
+
+		Customui1 = MyRow->BulletNumber; // numero di colpi da sparare
+		Customf3  = MyRow->BulletDelay;  //tempo tra un colpo e l'altro
+
+
+		switch (MyRow->BulletKind)
+		{
+		case EBulletKind::EBK_Normal: BulletName = "NormalBullet"; break;
+		case EBulletKind::EBK_Laser:    break;
+		case EBulletKind::EBK_Follow:   break;
+		case EBulletKind::EBK_Spiral:   break;
+		case EBulletKind::EBK_Spread:   break;
+		}
+
+
 		break;
 
 		case EWaveMode::EWM_Back:

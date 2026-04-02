@@ -18,7 +18,6 @@ struct FEnemyTableRaw : public FTableRowBase
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	EWaveMode  WaveMode{ EWaveMode::EWM_Straight };
 	
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
 	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Sinus", EditConditionHides) )
 	float SinusAmp{ 100 };
@@ -35,7 +34,7 @@ struct FEnemyTableRaw : public FTableRowBase
 	// variabile da sfruttare per definire un tempo limitato
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
 		meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
-	float Counter{ 1.f };
+	float EnemyDelay{ 1.f };
 
 	/* Valore utilizzato per identificar eun punto ad un certa distanza dalla camera (di solito asse X) */
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
@@ -61,6 +60,21 @@ struct FEnemyTableRaw : public FTableRowBase
 	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Back", EditConditionHides))
 	float RotationSpeed{ 360.f };
 
+	// numero di proiettili, con zero non spara
+	// a seconda del tipo di ondata i proiettili potrebbero essere 
+	//sparati in momenti differenti
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
+	uint8 BulletNumber{ 0 };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
+	float BulletDelay{ 0.2f }; // tempo che intercorre tra un proiettile e l'altro
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
+	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
+
 };
 
 USTRUCT(BlueprintType)
@@ -76,5 +90,62 @@ struct FPlayerTableRaw: public FTableRowBase
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	float Vel{ 1200.f };
+
+};
+
+
+USTRUCT(BlueprintType)
+struct FPBulletTableRaw : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UStaticMesh* Mesh{ nullptr };
+
+	// effetto particellare per impatto del proiettile
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UNiagaraSystem* ExplosionFX{ nullptr };
+
+	// effetto particellare per scia del proiettile
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UNiagaraSystem* MoveFX{ nullptr };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Vel{ 1200.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Scale{ 1.f };
+
+
+};
+
+
+USTRUCT(BlueprintType)
+struct FEBulletTableRaw : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UStaticMesh* Mesh{ nullptr };
+
+	// effetto particellare per impatto del proiettile
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UNiagaraSystem* ExplosionFX{ nullptr };
+
+	// effetto particellare per scia del proiettile
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UNiagaraSystem* MoveFX{ nullptr };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Vel{ 1200.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Scale{ 1.f };
 
 };

@@ -10,6 +10,7 @@
 class ABaseFoe;
 class AExplosion;
 class APCamera;
+class AEBullet;
 
 UCLASS()
 class ZAXTON_API AZaxMode : public AGameMode
@@ -23,13 +24,15 @@ public:
     virtual void Tick(float DeltaTime) override;
 
 	// gestione di pool per spawn proiettili
-	TArray<ABaseFoe*> Available; // proiettili disponibili
-	TArray<ABaseFoe*> InUse;     //proiettili correntemente in uso
+	TArray<ABaseFoe*> Available; // Nemici disponibili
+	TArray<ABaseFoe*> InUse;     // Nemici correntemente in uso
 
 	//virtual void StartPlay() override;
 	// array per actor con Niagaracomponent.
 	TArray<AExplosion*> AvailableEffects;
 
+    TArray<AEBullet*> AvailableEBullet; // proiettili disponibili per i nemici
+    TArray<AEBullet*> InUseEBullet;     // proiettili dei nemici in uso
 
     // LookupTable sin
     const FFloat16 sinLUT[256] = {

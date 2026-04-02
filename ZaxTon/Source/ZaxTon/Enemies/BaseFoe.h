@@ -62,10 +62,17 @@ class ZAXTON_API ABaseFoe : public AActor
 	float Customf3{ 0.f }; // utilizzo per gradi attuali
 	float Customf4{ 0.f };
 
+	float Counter{ 0.f };// una variabile da utilizzare in tutti i cicli
+	// in cui si scala un valore e si esegue qualcosa quando va
+	//a zero
+
 
 	int8  Customi1{ 0   }; //-128 + 128
+	uint8 Customui1{ 0 }; // 0 / 255
 
 	uint8 SubState{ 0 }; // utilizzato per switch dei "sotto stati" di un singolo comportamento
+
+	FName BulletName{ "NormalBullet" };
 
 	bool  bCustomBool{ false };
 
