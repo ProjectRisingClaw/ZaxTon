@@ -93,38 +93,8 @@ struct FPlayerTableRaw: public FTableRowBase
 
 };
 
-
 USTRUCT(BlueprintType)
-struct FPBulletTableRaw : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
-	UStaticMesh* Mesh{ nullptr };
-
-	// effetto particellare per impatto del proiettile
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
-	UNiagaraSystem* ExplosionFX{ nullptr };
-
-	// effetto particellare per scia del proiettile
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
-	UNiagaraSystem* MoveFX{ nullptr };
-
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
-	float Vel{ 1200.f };
-
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
-	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
-
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
-	float Scale{ 1.f };
-
-
-};
-
-
-USTRUCT(BlueprintType)
-struct FEBulletTableRaw : public FTableRowBase
+struct FBulletTableRaw : public FTableRowBase
 {
 	GENERATED_BODY()
 

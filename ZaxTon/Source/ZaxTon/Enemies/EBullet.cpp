@@ -24,7 +24,7 @@ AEBullet::AEBullet()
 	Body->SetupAttachment(Collision);
 
 
-	auto Path = TEXT("/Game/DataTables/BPEnemyBulletTable");
+	auto Path = TEXT("/Game/DataTables/BPEnemyBulletTable.BPEnemyBulletTable");
 	MyDT = LoadObject<UDataTable>(nullptr, Path); // recupero la DT tramite Path
 
 
@@ -36,7 +36,7 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 
 	// controlla la riga della tabella e carica dati
 
-	FEBulletTableRaw* MyRow{ MyDT->FindRow<FEBulletTableRaw>(AttackType,TEXT("Context")) };
+	FBulletTableRaw* MyRow{ MyDT->FindRow<FBulletTableRaw>(AttackType,TEXT("Context")) };
 
 	if (MyRow) // ad ogni activate carico dati dalla tabella
 	{
