@@ -7,6 +7,9 @@
 #include "PBullet.generated.h"
 
 class USphereComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
+
 
 UCLASS()
 class ZAXTON_API APBullet : public AActor
@@ -14,9 +17,16 @@ class ZAXTON_API APBullet : public AActor
 	GENERATED_BODY()
 	
 
+	// collisione effettiva per il proiettile (root)
 	USphereComponent*     Collision{ nullptr };
 
+	// eventuale mesh statica per grafica del proiettile
 	UStaticMeshComponent* Body{ nullptr };
+
+	// effetto persistente del proiettile
+	UNiagaraComponent*    VfxComp{ nullptr };
+
+
 
 	float Vel{ 3500.f };
 

@@ -4,6 +4,7 @@
 #include "Explosion.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+//#include "NiagaraFunctionLibrary.h" // devo poi disattivarla
 #include "ZaxTon/ZaxMode.h"
 
 // Sets default values
@@ -25,6 +26,10 @@ void AExplosion::BeginPlay()
 	Super::BeginPlay();	
 	// bind di evento fine particellare
 	Comp->OnSystemFinished.AddDynamic(this,&AExplosion::SystemEnd);
+
+	//UNiagaraFunctionLibrary::SpawnSystemAtLocation();
+	
+
 }
 
 // evento che sarà richiamato af ine effetto particellare

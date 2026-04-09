@@ -7,6 +7,10 @@
 #include "Components/SphereComponent.h"
 #include "ZaxTon/Headers/DataTables.h" 
 #include "ZaxTon/Headers/Enumerators.h"
+// gestione particellari
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+
 // Sets default values
 APBullet::APBullet()
 {
@@ -22,7 +26,10 @@ APBullet::APBullet()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
 
-	
+	// creazione componetne Niagara
+	VfxComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("VfxComp"));
+	VfxComp->SetupAttachment(Collision);
+
 	auto Path = TEXT("/Game/DataTables/BPPlayerBulletTable");
 	MyDT = LoadObject<UDataTable>(nullptr, Path); // recupero la DT tramite Path
 
@@ -59,7 +66,7 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		Body->SetStaticMesh(MyRow->Mesh);
 		Body->SetRelativeScale3D(FVector(MyRow->Scale));
 		Vel = MyRow->Vel;
-
+		VfxComp->SetAsset(MyRow->MoveFX); // assegno al componente il particellare in loop
 	}
 
 	// disattivo collisione proiettile 
@@ -72,6 +79,12 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
 	Durata = 1.5; // ripristino durata proiettile
+
+	VfxComp->Activate();
+	VfxComp->ActivateSystem();
+
+	VfxComp->SetNiagaraVariableVec3("StartPoint",GetActorLocation() );
+	VfxComp->SetNiagaraVariableVec3("EndPoint", GetActorLocation());
 
 }
 
@@ -98,6 +111,9 @@ void APBullet::DeActivate()
 		MyShip->Available.AddUnique(this);
 	}
 	// se sto tra quelli in uso, mi rimuovo dalla lista
+
+	VfxComp->Deactivate();
+
 }
 
 // Called when the game starts or when spawned
@@ -134,6 +150,8 @@ void APBullet::UpdateLoc(float DeltaTime)
 	{
 		Durata -= DeltaTime;
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+		VfxComp->SetNiagaraVariableVec3("EndPoint", GetActorLocation());
 	}
 	else DeActivate();
 }
