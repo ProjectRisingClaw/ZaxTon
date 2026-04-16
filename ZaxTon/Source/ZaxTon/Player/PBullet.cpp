@@ -78,13 +78,13 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	// posiziono l'ogggetto in una zona lontana da quella di azione
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
-	Durata = 1.5; // ripristino durata proiettile
+	Durata = 1; // ripristino durata proiettile
+
+	VfxComp->SetNiagaraVariableVec3("StartPoint", GetActorLocation());
+	VfxComp->SetNiagaraVariableVec3("EndPoint",   GetActorLocation());
 
 	VfxComp->Activate();
 	VfxComp->ActivateSystem();
-
-	VfxComp->SetNiagaraVariableVec3("StartPoint",GetActorLocation() );
-	VfxComp->SetNiagaraVariableVec3("EndPoint", GetActorLocation());
 
 }
 
@@ -92,6 +92,8 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 void APBullet::DeActivate()
 {
 	// disattivo collisione proiettile 
+	VfxComp->Deactivate();
+
 
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -112,7 +114,7 @@ void APBullet::DeActivate()
 	}
 	// se sto tra quelli in uso, mi rimuovo dalla lista
 
-	VfxComp->Deactivate();
+	
 
 }
 
@@ -135,10 +137,10 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	if (!Cast<USphereComponent>(OtherComp)) return; // desidero l'overlap preciso con la capsula
 
 	Foe->SpawnDieEffect(); // effetto particellare esplosione
-
-	Foe->DeActivate();  // rimuovo nemico
+	Foe->DeActivate();     // rimuovo nemico	
 	
-	DeActivate(); // rimuovo me stesso
+	VfxComp->DeactivateImmediate();
+	DeActivate();          // rimuovo me stesso
 
 
 }
@@ -149,10 +151,20 @@ void APBullet::UpdateLoc(float DeltaTime)
 	if (Durata > 0)
 	{
 		Durata -= DeltaTime;
+
+		float Lunghezza{ (1.f - Durata) * 500.f };
+		
+		VfxComp->SetNiagaraVariableVec3("StartPoint", GetActorLocation() - GetActorForwardVector() * Lunghezza);
+		VfxComp->SetNiagaraVariableVec3("EndPoint", GetActorLocation());
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 
-		VfxComp->SetNiagaraVariableVec3("EndPoint", GetActorLocation());
+		
 	}
-	else DeActivate();
+	else
+	{
+		
+		VfxComp->DeactivateImmediate();
+		DeActivate();
+	}
 }
 
