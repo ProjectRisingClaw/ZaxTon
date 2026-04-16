@@ -122,17 +122,7 @@ APShip::APShip()
 void APShip::BeginPlay()
 {
 	Super::BeginPlay();
-	// inizializzo il mio array "pool"
-	// creao 15 proiettili e li inserisco tra quelli disponibili per essere sparati
-	for (int i = 0; i < 15; i++)
-	{
-		// creo istanza
-		auto bull{ GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass()) };
-		bull->SetOwner(this); // come creo il proiettile
-		// gli lascio un riferimento all'oggetto che lo ha creato
-		bull->DeActivate(); // disattivo istanza
-	}
-	
+
 	// il fire rate messo come vaolre iniziale si intende in 
 	// proiettil ial secondo. qui lo ricaloclolo come 1/ numero di proiettili
 	FireRate = 1 / FireRate;
@@ -146,6 +136,21 @@ void APShip::BeginPlay()
 		Path));*/ // rimosso perchè adesso caricato dalla Data Table
 
 	MyGM = Cast<AZaxMode>(GetWorld()->GetAuthGameMode());
+
+	// inizializzo il mio array "pool"
+// creao 15 proiettili e li inserisco tra quelli disponibili per essere sparati
+	for (int i = 0; i < 24; i++)
+	{
+		// creo istanza
+		auto bull{ GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass()) };
+		bull->SetOwner(this); // come creo il proiettile
+		// gli lascio un riferimento all'oggetto che lo ha creato
+		bull->DeActivate(); // disattivo istanza
+		bull->MyGM = MyGM;  // passo al bullet riferimento al game mode.
+	}
+
+
+
 
 	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
 	{

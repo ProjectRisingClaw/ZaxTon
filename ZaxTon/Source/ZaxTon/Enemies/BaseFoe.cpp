@@ -60,6 +60,31 @@ void ABaseFoe::BeginPlay()
 }
 
 
+void ABaseFoe::Hitted()
+{
+	//UMaterialInstanceDynamic* Coso;
+	//Coso->Set
+	//Body->CreateDynamicMaterialInstance()
+
+	if (HitPoint > 1)
+	{
+	    // Creo qui l'istanza dinamica di un materiale, partendo da un materiale statico
+		UMaterialInstanceDynamic* HitDynamic{ Body->CreateDynamicMaterialInstance(0,HitMaterial) };
+		HitDynamic->SetScalarParameterValue("Luminosita",60);
+		Body->SetMaterial(0, HitDynamic);
+
+
+		FTimerHandle TempTimer;
+		GetWorldTimerManager().SetTimer(TempTimer, this, &ABaseFoe::ResetMaterial, 0.1);
+		HitPoint--;
+	}
+	else
+	{
+		SpawnDieEffect(); // effetto particellare esplosione
+		DeActivate();     // rimuovo nemico
+	}
+}
+
 void ABaseFoe::UpdateLoc(float DeltaTime)
 {
 	switch (WaveMode)
@@ -294,8 +319,12 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
 		ExplosionEffect =   MyRow->ExplosionFX; // copio valore VFX da Data table;
 		WaveMode        =   MyRow->WaveMode;
-		                    MyRow->OrientVector;
-         
+		HitPoint        =   MyRow->HitPoint; // memorizzo i colpi che si possono subire
+		HitMaterial     =   MyRow->HitMaterial;
+
+		StandardMaterial = Cast<UMaterial>(MyRow->Mesh->GetMaterial(0));
+		ResetMaterial();
+
 		switch (MyRow->OrientVector)
 				{
 				case EOrientVector::EOV_Forward: LoopAxis   = GetActorForwardVector();  break;
@@ -407,4 +436,15 @@ void ABaseFoe::DeActivate()
 		
 	}
 	// se sto tra quelli in uso, mi rimuovo dalla lista
+	ResetMaterial();
+}
+
+
+void ABaseFoe::ResetMaterial()
+{
+	if (StandardMaterial)
+	{
+		Body->SetMaterial(0, StandardMaterial);
+		UE_LOG(LogTemp, Error, TEXT("resetmat %s"), *StandardMaterial->GetName())
+	}
 }

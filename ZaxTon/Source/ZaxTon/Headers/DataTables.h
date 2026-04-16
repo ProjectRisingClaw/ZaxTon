@@ -75,6 +75,12 @@ struct FEnemyTableRaw : public FTableRowBase
 	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
 	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
 
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	uint8 HitPoint{ 1 };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UMaterial* HitMaterial{ nullptr };
+
 };
 
 USTRUCT(BlueprintType)

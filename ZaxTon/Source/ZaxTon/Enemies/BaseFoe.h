@@ -20,6 +20,7 @@ class ZAXTON_API ABaseFoe : public AActor
 	// un solo putatore creato non vuol dire
 	// avere il componente, è solo il contenitore
 	// componente static mesh
+	UPROPERTY(VisibleAnyWhere)
 	UStaticMeshComponent* Body{ nullptr };
 	//UStaticMeshComponent* Body = nullptr;
 
@@ -76,6 +77,13 @@ class ZAXTON_API ABaseFoe : public AActor
 
 	bool  bCustomBool{ false };
 
+	uint8 HitPoint{ 1 };
+
+	UMaterial* HitMaterial{ nullptr };
+	UMaterial* StandardMaterial{ nullptr };
+
+	void ResetMaterial();
+
 public:	
 
 	FORCEINLINE void SetCustom3(float NewVal) { Customf3 = NewVal; };
@@ -100,6 +108,7 @@ protected:
 
 public:	
 	
+	void Hitted();
 
 	void UpdateLoc(float DeltaTime);
 

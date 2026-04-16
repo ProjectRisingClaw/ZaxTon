@@ -9,7 +9,7 @@
 class USphereComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
-
+class AZaxMode;
 
 UCLASS()
 class ZAXTON_API APBullet : public AActor
@@ -26,13 +26,14 @@ class ZAXTON_API APBullet : public AActor
 	// effetto persistente del proiettile
 	UNiagaraComponent*    VfxComp{ nullptr };
 
-
+	// effetto persistente del proiettile
+	UNiagaraSystem*       NSImpact{ nullptr };
 
 	float Vel{ 3500.f };
 
 	UDataTable* MyDT{ nullptr }; // Data Table da cui prendere i dati del proiettile
 
-
+	
 
 	//FName TipiNemici[10]{ "NemicoA","NemicoB","NemicoC","NemicoD","NemicoE","","","","","" };
 
@@ -51,6 +52,8 @@ public:
 	// quando ri messo da parte nella pool
 	void DeActivate();
 
+
+	AZaxMode* MyGM{ nullptr };// riferimento al game mode
 
 protected:
 	// Called when the game starts or when spawned

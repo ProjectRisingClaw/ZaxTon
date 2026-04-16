@@ -7,6 +7,8 @@
 #include "Components/SphereComponent.h"
 #include "ZaxTon/Headers/DataTables.h" 
 #include "ZaxTon/Headers/Enumerators.h"
+#include "ZaxTon/ZaxMode.h"
+#include "ZaxTon/Effects/Explosion.h" // include per l'actor che gestisce esplosioni semplici
 // gestione particellari
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
@@ -67,6 +69,9 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		Body->SetRelativeScale3D(FVector(MyRow->Scale));
 		Vel = MyRow->Vel;
 		VfxComp->SetAsset(MyRow->MoveFX); // assegno al componente il particellare in loop
+		NSImpact = MyRow->ExplosionFX;
+		
+		//VfxImpact->SetAsset(MyRow->ExplosionFX); // effetto da passare all'actor delle esposioni
 	}
 
 	// disattivo collisione proiettile 
@@ -136,9 +141,18 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 
 	if (!Cast<USphereComponent>(OtherComp)) return; // desidero l'overlap preciso con la capsula
 
-	Foe->SpawnDieEffect(); // effetto particellare esplosione
-	Foe->DeActivate();     // rimuovo nemico	
+	// in ogni caso con l'impatto, creo un oggetto per i particellari
+
+	if (MyGM->AvailableEffects.Num() > 0)
+	{
+		auto Effect{ MyGM->AvailableEffects.Pop() };
+		Effect->Activate(GetActorLocation(), FRotator(0), NSImpact);
+	}
 	
+	Foe->Hitted(); // informo il nemico di essere stato colpito, gestira lui rimozione HP
+
+	//Foe->HitPoint 
+
 	VfxComp->DeactivateImmediate();
 	DeActivate();          // rimuovo me stesso
 
