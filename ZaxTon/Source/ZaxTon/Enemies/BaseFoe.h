@@ -82,8 +82,12 @@ class ZAXTON_API ABaseFoe : public AActor
 	UMaterial* HitMaterial{ nullptr };
 	UMaterial* StandardMaterial{ nullptr };
 
+	UMaterialInstanceDynamic* HitDynamic{ nullptr };
+	FTimerHandle TempTimer;
+
 	void ResetMaterial();
 
+	float ContLum{ 1.f };
 public:	
 
 	FORCEINLINE void SetCustom3(float NewVal) { Customf3 = NewVal; };

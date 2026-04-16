@@ -69,13 +69,13 @@ void ABaseFoe::Hitted()
 	if (HitPoint > 1)
 	{
 	    // Creo qui l'istanza dinamica di un materiale, partendo da un materiale statico
-		UMaterialInstanceDynamic* HitDynamic{ Body->CreateDynamicMaterialInstance(0,HitMaterial) };
-		HitDynamic->SetScalarParameterValue("Luminosita",60);
+		HitDynamic = Body->CreateDynamicMaterialInstance(0,HitMaterial);
+		ContLum = 1.f;
+		HitDynamic->SetScalarParameterValue("Luminosita", ContLum);
 		Body->SetMaterial(0, HitDynamic);
 
-
-		FTimerHandle TempTimer;
-		GetWorldTimerManager().SetTimer(TempTimer, this, &ABaseFoe::ResetMaterial, 0.1);
+		//FTimerHandle TempTimer;
+		GetWorldTimerManager().SetTimer(TempTimer, this, &ABaseFoe::ResetMaterial, 0.1f);
 		HitPoint--;
 	}
 	else
@@ -93,7 +93,12 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 	case EWaveMode::EWM_Sinus:    WaveSinus(DeltaTime);    break;
 	case EWaveMode::EWM_Wait:     WaveWait(DeltaTime);     break;
 	case EWaveMode::EWM_Back:     WaveBack(DeltaTime);     break;
+	}
 
+	if (GetWorldTimerManager().IsTimerActive(TempTimer)){
+		ContLum += DeltaTime * 300;
+		HitDynamic->SetScalarParameterValue("Luminosita", ContLum);
+		//UE_LOG(LogTemp, Error, TEXT("ContLum: %f"), ContLum);
 	}
 }
 
@@ -435,6 +440,7 @@ void ABaseFoe::DeActivate()
 
 		
 	}
+
 	// se sto tra quelli in uso, mi rimuovo dalla lista
 	ResetMaterial();
 }
@@ -445,6 +451,6 @@ void ABaseFoe::ResetMaterial()
 	if (StandardMaterial)
 	{
 		Body->SetMaterial(0, StandardMaterial);
-		UE_LOG(LogTemp, Error, TEXT("resetmat %s"), *StandardMaterial->GetName())
+		UE_LOG(LogTemp, Error, TEXT("resetmat %s"), *StandardMaterial->GetName());
 	}
 }
