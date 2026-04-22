@@ -70,7 +70,7 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		Vel = MyRow->Vel;
 		VfxComp->SetAsset(MyRow->MoveFX); // assegno al componente il particellare in loop
 		NSImpact = MyRow->ExplosionFX;
-		
+	
 		//VfxImpact->SetAsset(MyRow->ExplosionFX); // effetto da passare all'actor delle esposioni
 	}
 

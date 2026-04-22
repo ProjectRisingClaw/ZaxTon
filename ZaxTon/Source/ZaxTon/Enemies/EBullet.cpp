@@ -43,19 +43,39 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		Body->SetStaticMesh(MyRow->Mesh);
 		Body->SetRelativeScale3D(FVector(MyRow->Scale));
 		Vel = MyRow->Vel;
+		BulletKind = MyRow->BulletKind;
+
+
+		Degree = MyRow->Degree;
+		Number = MyRow->SpreadNumber;
 	}
 
 	// disattivo collisione proiettile 
-	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	if (BulletKind == EBulletKind::EBK_Spread) // se il proiettile è di tipo spread
+	{ // non ha una funzione diretta. quello che farà sarà a sua volta generare un gruppo di proiettili
+		// normali in varie direzioni  (basandosi su variabili di gradi e quantità)
 
-	//PrimaryActorTick.bCanEverTick = true;
-	// nascondo grafica del proiettile
-	Body->SetHiddenInGame(false);
-	// posiziono l'ogggetto in una zona lontana da quella di azione
-	SetActorLocation(SpawnLocation);
-	SetActorRotation(SpawnRotation);
-	Durata = 5.f; // ripristino durata proiettile
 
+
+
+
+
+
+
+		// subito dopo averli creati si disattiva.
+		DeActivate();
+	}
+	else
+	{
+		Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		//PrimaryActorTick.bCanEverTick = true;
+		// nascondo grafica del proiettile
+		Body->SetHiddenInGame(false);
+		// posiziono l'ogggetto in una zona lontana da quella di azione
+		SetActorLocation(SpawnLocation);
+		SetActorRotation(SpawnRotation);
+		Durata = 5.f; // ripristino durata proiettile
+	}
 }
 
 

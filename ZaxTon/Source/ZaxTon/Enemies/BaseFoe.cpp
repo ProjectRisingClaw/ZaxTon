@@ -177,19 +177,19 @@ void ABaseFoe::WaveWait(float DeltaTime)
 		if (Counter > 0) Counter -= DeltaTime;
 		else
 		{		
-				
+		/*	switch (Bullet)
+			{
+			default:
+				break;
+			}*/
+
 				if (MyGM->AvailableEBullet.Num() > 0)
 				{
-					AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
-					FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
-
-					NewBull->Activate(SpawnLocation, GetActorRotation(), BulletName);
-					MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
+					FireBullet();
 				}
 
 			Customui1 -= 1;
 
-		
 			Counter    = Customf3; // rimetto il contaatore alla dimensione del Dealy
 		}
 
@@ -202,6 +202,26 @@ void ABaseFoe::WaveWait(float DeltaTime)
 
 	}
 	//MyGM->MyCamera;
+}
+
+void ABaseFoe::FireBullet()
+{
+	if (BulletName == "SpreadBullet") // nel caso di proiettile spread  dovro spararne più
+	{  // di uno in direzioni diverse
+
+
+
+	}
+	else
+	{
+		AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
+		FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
+
+		NewBull->Activate(SpawnLocation, GetActorRotation(), BulletName);
+		MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
+	}
+
+
 }
 
 void ABaseFoe::WaveBack(float DeltaTime)
@@ -364,7 +384,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		case EBulletKind::EBK_Laser:    break;
 		case EBulletKind::EBK_Follow:   break;
 		case EBulletKind::EBK_Spiral:   break;
-		case EBulletKind::EBK_Spread:   break;
+		case EBulletKind::EBK_Spread:  BulletName = "SpreadBullet"; break;
 		}
 
 

@@ -124,4 +124,13 @@ struct FBulletTableRaw : public FTableRowBase
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	float Scale{ 1.f };
 
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
+		meta = (EditCondition = "BulletKind ==  EBulletKind::EBK_Spread", EditConditionHides))
+	float Degree{ 20.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
+		meta = (EditCondition = "BulletKind ==  EBulletKind::EBK_Spread", EditConditionHides))
+	uint8 SpreadNumber{ 3 };
+
 };
