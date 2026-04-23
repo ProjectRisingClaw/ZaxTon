@@ -54,13 +54,26 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	if (BulletKind == EBulletKind::EBK_Spread) // se il proiettile è di tipo spread
 	{ // non ha una funzione diretta. quello che farà sarà a sua volta generare un gruppo di proiettili
 		// normali in varie direzioni  (basandosi su variabili di gradi e quantità)
+		
+		// imposto un offset negativo
+		float OffsetRot = -Degree * uint8(Number/2);
+	
+		if (Number % 2 == 0) // correggo l'offset in caso di proiettili pari
+		{ OffsetRot += Degree / 2; }
 
-
-
-
-
-
-
+		 // partendo dall'offset negativo incremetno i gradi ad ogni iterazione del ciclo
+		for (int i = 0; i < Number; i++)
+		{	
+			if (MyGM->AvailableEBullet.Num()>0)
+			{
+			    AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };	
+				FRotator BaseRot{ SpawnRotation };
+				BaseRot.Yaw += OffsetRot + Degree * i;
+				NewBull->Activate(SpawnLocation, BaseRot);
+				MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
+			}
+			else UE_LOG(LogTemp, Error, TEXT("nessun proiettile disponibile"));
+		}
 
 		// subito dopo averli creati si disattiva.
 		DeActivate();

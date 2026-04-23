@@ -57,7 +57,7 @@ void AZaxMode::BeginPlay()
 
 	}
 
-	for (int i = 0; i < 100; i++) // creo tutti i proiettili per i nemici
+	for (int i = 0; i < 200; i++) // creo tutti i proiettili per i nemici
 	{
 		AEBullet* Bullet{ GetWorld()->SpawnActor<AEBullet>(AEBullet::StaticClass()) };
 

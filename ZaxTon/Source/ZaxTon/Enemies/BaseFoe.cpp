@@ -206,19 +206,23 @@ void ABaseFoe::WaveWait(float DeltaTime)
 
 void ABaseFoe::FireBullet()
 {
-	if (BulletName == "SpreadBullet") // nel caso di proiettile spread  dovro spararne più
+	/*if (BulletName == "SpreadBullet") // nel caso di proiettile spread  dovro spararne più
 	{  // di uno in direzioni diverse
 
 
 
 	}
-	else
+	else*/
 	{
-		AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
-		FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
 
+		if (MyGM->AvailableEBullet.Num() > 0)
+		{	
+		AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
+      	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
 		NewBull->Activate(SpawnLocation, GetActorRotation(), BulletName);
 		MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
+		}
+		else UE_LOG(LogTemp, Error, TEXT("Nessun proiettile disponibile"));
 	}
 
 
