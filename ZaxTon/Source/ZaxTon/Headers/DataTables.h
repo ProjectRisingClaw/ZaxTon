@@ -104,24 +104,24 @@ struct FBulletTableRaw : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,meta = (EditCondition = "BulletKind !=  EBulletKind::EBK_Spread", EditConditionHides))
 	UStaticMesh* Mesh{ nullptr };
 
 	// effetto particellare per impatto del proiettile
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (EditCondition = "BulletKind !=  EBulletKind::EBK_Spread", EditConditionHides))
 	UNiagaraSystem* ExplosionFX{ nullptr };
 
 	// effetto particellare per scia del proiettile
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (EditCondition = "BulletKind !=  EBulletKind::EBK_Spread", EditConditionHides))
 	UNiagaraSystem* MoveFX{ nullptr };
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (EditCondition = "BulletKind !=  EBulletKind::EBK_Spread", EditConditionHides))
 	float Vel{ 1200.f };
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (EditCondition = "BulletKind !=  EBulletKind::EBK_Spread", EditConditionHides))
 	float Scale{ 1.f };
 
 
@@ -132,5 +132,15 @@ struct FBulletTableRaw : public FTableRowBase
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
 		meta = (EditCondition = "BulletKind ==  EBulletKind::EBK_Spread", EditConditionHides))
 	uint8 SpreadNumber{ 3 };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
+		meta = (EditCondition = "BulletKind ==  EBulletKind::EBK_Laser", EditConditionHides))
+	float Wait{ 3.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
+		meta = (EditCondition = "BulletKind ==  EBulletKind::EBK_Laser", EditConditionHides))
+	float Distance{ 500.f };
+
+
 
 };

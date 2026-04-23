@@ -8,6 +8,10 @@
 #include "ZaxTon/Headers/DataTables.h" 
 #include "ZaxTon/Headers/Enumerators.h"
 #include "ZaxTon/ZaxMode.h" 
+// gestione particellari
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+
 
 AEBullet::AEBullet()
 {
@@ -22,6 +26,10 @@ AEBullet::AEBullet()
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
+
+	// creazione componetne Niagara
+	VfxComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("VfxComp"));
+	VfxComp->SetupAttachment(Collision);
 
 
 	auto Path = TEXT("/Game/DataTables/BPEnemyBulletTable.BPEnemyBulletTable");
@@ -44,6 +52,7 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		Body->SetRelativeScale3D(FVector(MyRow->Scale));
 		Vel = MyRow->Vel;
 		BulletKind = MyRow->BulletKind;
+		VfxComp->SetAsset(MyRow->MoveFX);
 
 
 		Degree = MyRow->Degree;
@@ -88,6 +97,38 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		SetActorLocation(SpawnLocation);
 		SetActorRotation(SpawnRotation);
 		Durata = 5.f; // ripristino durata proiettile
+
+	
+		switch (BulletKind)
+		{
+		case EBulletKind::EBK_Normal:
+
+		break;
+
+		case EBulletKind::EBK_Follow:
+		break;
+
+		case EBulletKind::EBK_Spiral:
+		break;
+
+		case EBulletKind::EBK_Laser:
+			VfxComp->SetVariableVec3("StartPoint", GetActorLocation());
+			//VfxComp->SetVariableVec3("StartPoint", GetActorLocation());
+			VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
+
+			VfxComp->Activate();
+			VfxComp->ActivateSystem();
+		break;
+
+	
+
+	
+		}
+
+		
+
+
+
 	}
 }
 
@@ -128,6 +169,12 @@ void AEBullet::UpdateLoc(float DeltaTime)
 {
 	if (Durata > 0)
 	{
+
+		if (BulletKind == EBulletKind::EBK_Laser)
+		{
+			VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
+		}
+
 		Durata -= DeltaTime;
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 	}

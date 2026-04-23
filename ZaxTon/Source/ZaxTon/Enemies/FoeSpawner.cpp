@@ -50,6 +50,7 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 			break;
 
 			case EEnemyType::EET_NemicoC: // per il nemico B passo i gradi inziali per la sinusoide
+			case EEnemyType::EET_NemicoD: // per il nemico B passo i gradi inziali per la sinusoide
 			ToSpawn->Activate(GetActorLocation() - GetActorRightVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
 			ToSpawn->SetVel(Vel);
 			break;

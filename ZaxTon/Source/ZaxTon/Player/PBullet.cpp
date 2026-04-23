@@ -85,8 +85,9 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	SetActorRotation(SpawnRotation);
 	Durata = 1; // ripristino durata proiettile
 
-	VfxComp->SetNiagaraVariableVec3("StartPoint", GetActorLocation());
-	VfxComp->SetNiagaraVariableVec3("EndPoint",   GetActorLocation());
+	VfxComp->SetVariableVec3("StartPoint", GetActorLocation());
+	//VfxComp->SetVariableVec3("StartPoint", GetActorLocation());
+	VfxComp->SetVariableVec3("EndPoint",   GetActorLocation());
 
 	VfxComp->Activate();
 	VfxComp->ActivateSystem();

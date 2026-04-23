@@ -9,6 +9,8 @@
 
 class USphereComponent;
 class AZaxMode;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class ZAXTON_API AEBullet : public AActor
@@ -30,6 +32,8 @@ class ZAXTON_API AEBullet : public AActor
 	float Degree;
 
 	uint8 Number;
+
+	UNiagaraComponent* VfxComp{ nullptr };
 
 public:
 	// Sets default values for this actor's properties

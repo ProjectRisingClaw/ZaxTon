@@ -385,7 +385,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		switch (MyRow->BulletKind)
 		{
 		case EBulletKind::EBK_Normal: BulletName = "NormalBullet"; break;
-		case EBulletKind::EBK_Laser:    break;
+		case EBulletKind::EBK_Laser:  BulletName = "LaserBullet";  break;
 		case EBulletKind::EBK_Follow:   break;
 		case EBulletKind::EBK_Spiral:   break;
 		case EBulletKind::EBK_Spread:  BulletName = "SpreadBullet"; break;
