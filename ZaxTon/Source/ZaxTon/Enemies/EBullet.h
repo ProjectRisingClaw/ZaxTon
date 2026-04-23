@@ -11,6 +11,7 @@ class USphereComponent;
 class AZaxMode;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class APCamera;
 
 UCLASS()
 class ZAXTON_API AEBullet : public AActor
@@ -25,15 +26,21 @@ class ZAXTON_API AEBullet : public AActor
 
 	UDataTable* MyDT{ nullptr }; // Data Table da cui prendere i dati del proiettile
 
-
 	EBulletKind BulletKind{ EBulletKind::EBK_Normal } ;
-
 
 	float Degree;
 
 	uint8 Number;
 
 	UNiagaraComponent* VfxComp{ nullptr };
+
+	float Wait{ 5.f }; // quando un proiettile deve stare fermo per un pò in una certa posizione
+
+	float Distance{ 500.f }; // quando devo misurare la distanza tra il proiettile e un punto di origine
+	
+	uint8 substate{ 0 }; // eventuale sotto stato per proiettili che richiedono più fasi
+
+	APCamera* MyCamera;
 
 public:
 	// Sets default values for this actor's properties

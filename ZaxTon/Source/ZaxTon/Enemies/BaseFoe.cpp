@@ -151,7 +151,7 @@ void ABaseFoe::WaveWait(float DeltaTime)
 		if (Dist < Customf1)
 		{
 			SubState = 1;
-			Vel = -MyCamera->GetVel(); // velocità uguale e contraria alla camera
+			Vel = MyCamera->GetVel(); // velocità uguale e contraria alla camera
 			//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
 		}
 
@@ -166,7 +166,7 @@ void ABaseFoe::WaveWait(float DeltaTime)
 
 		if (Customf2  > 0)
 		{   // si mette in lock con la camera
-			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+			SetActorLocation(GetActorLocation() + MyCamera->GetActorUpVector() * DeltaTime * Vel);
 		}
 		else { Vel = 400.f; SubState = 2; } // assegno nuovamente velcoita in avanti
 
@@ -220,6 +220,7 @@ void ABaseFoe::FireBullet()
 		AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
       	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
 		NewBull->Activate(SpawnLocation, GetActorRotation(), BulletName);
+		NewBull->SetOwner(this); // do al proiettile un riferimento a chi lo ha attivato
 		MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
 		}
 		else UE_LOG(LogTemp, Error, TEXT("Nessun proiettile disponibile"));

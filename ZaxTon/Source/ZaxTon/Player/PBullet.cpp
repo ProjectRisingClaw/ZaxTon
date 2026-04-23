@@ -169,8 +169,8 @@ void APBullet::UpdateLoc(float DeltaTime)
 
 		float Lunghezza{ (1.f - Durata) * 500.f };
 		
-		VfxComp->SetNiagaraVariableVec3("StartPoint", GetActorLocation() - GetActorForwardVector() * Lunghezza);
-		VfxComp->SetNiagaraVariableVec3("EndPoint", GetActorLocation());
+		VfxComp->SetVariableVec3("StartPoint", GetActorLocation() - GetActorForwardVector() * Lunghezza);
+		VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 
 		

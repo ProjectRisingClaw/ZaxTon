@@ -13,6 +13,9 @@
 #include "NiagaraSystem.h"
 
 
+#include "ZaxTon/Player/PCamera.h"
+#include "EngineUtils.h"
+
 AEBullet::AEBullet()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -46,6 +49,8 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 
 	FBulletTableRaw* MyRow{ MyDT->FindRow<FBulletTableRaw>(AttackType,TEXT("Context")) };
 
+	substate = 0; // reset di sotto stato 
+
 	if (MyRow) // ad ogni activate carico dati dalla tabella
 	{
 		Body->SetStaticMesh(MyRow->Mesh);
@@ -54,9 +59,13 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		BulletKind = MyRow->BulletKind;
 		VfxComp->SetAsset(MyRow->MoveFX);
 
-
+		// spread bullet
 		Degree = MyRow->Degree;
 		Number = MyRow->SpreadNumber;
+		// laser bullet
+		Distance = MyRow->Distance;
+		Wait     = MyRow->Wait;
+
 	}
 
 	// disattivo collisione proiettile 
@@ -160,23 +169,81 @@ void AEBullet::BeginPlay()
 {
 	Super::BeginPlay();
 	//SetLifeSpan(1.5f); // dopo 1.5 secondi viene rimosso
-
+		// memorizzo il pointer alla camera
+	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
+	{
+		MyCamera = *CamList;
+	}
 }
 
 
 
 void AEBullet::UpdateLoc(float DeltaTime)
 {
-	if (Durata > 0)
+
+	switch (BulletKind)
 	{
 
-		if (BulletKind == EBulletKind::EBK_Laser)
+	case EBulletKind::EBK_Follow:
+	break;
+	case EBulletKind::EBK_Spiral:
+	break;
+	case EBulletKind::EBK_Laser:
+
+
+		FVector StartPoint{ GetOwner()->GetActorLocation() };
+
+		switch (substate)
 		{
-			VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
+		case 0: // avanzo fino a raggiungere la distanza desiderata
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+		FVector Diff{ GetActorLocation() - StartPoint };
+		if (Diff.Size() > Distance)
+		{ 
+			substate = 1;
+			Vel = MyCamera->GetVel();
 		}
 
-		Durata -= DeltaTime;
-		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		//Distance 
+
+		break;
+
+
+		case 1: // attivo il counter e aspetto il tempo di wait
+
+			SetActorLocation(GetActorLocation() + MyCamera->GetActorUpVector() * DeltaTime * Vel);
+
+		break;
+
+		case 2: // mi disattivo 
+
+
+		break;
+
+		}
+
+     
+		
+	VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
+	VfxComp->SetVariableVec3("StartPoint", StartPoint);
+	
+
+    break;
+	
+	default:
+
+		if (Durata > 0)
+		{	
+			Durata -= DeltaTime;
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		}
+		else DeActivate();
+
+
 	}
-	else DeActivate();
+
+	
+
+
 }
