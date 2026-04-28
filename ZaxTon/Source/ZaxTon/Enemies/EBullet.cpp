@@ -144,8 +144,11 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 
 void AEBullet::DeActivate()
 {
+	// disattivo VFX ( se non era stato attivato non dovrebbe succeder nulla)
+	VfxComp->ResetSystem();
+	VfxComp->DeactivateImmediate();
+	
 	// disattivo collisione proiettile 
-
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -162,6 +165,9 @@ void AEBullet::DeActivate()
 		MyGM->AvailableEBullet.AddUnique(this);
 	}
 	// se sto tra quelli in uso, mi rimuovo dalla lista
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -193,6 +199,9 @@ void AEBullet::UpdateLoc(float DeltaTime)
 
 		FVector StartPoint{ GetOwner()->GetActorLocation() };
 
+		if (Wait > 0)  Wait -= DeltaTime;
+		else           substate = 2;
+
 		switch (substate)
 		{
 		case 0: // avanzo fino a raggiungere la distanza desiderata
@@ -211,14 +220,13 @@ void AEBullet::UpdateLoc(float DeltaTime)
 
 
 		case 1: // attivo il counter e aspetto il tempo di wait
-
+	
 			SetActorLocation(GetActorLocation() + MyCamera->GetActorUpVector() * DeltaTime * Vel);
-
+			
 		break;
 
 		case 2: // mi disattivo 
-
-
+			DeActivate();
 		break;
 
 		}

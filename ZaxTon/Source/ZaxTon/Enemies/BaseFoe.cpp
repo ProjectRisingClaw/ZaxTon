@@ -177,16 +177,9 @@ void ABaseFoe::WaveWait(float DeltaTime)
 		if (Counter > 0) Counter -= DeltaTime;
 		else
 		{		
-		/*	switch (Bullet)
-			{
-			default:
-				break;
-			}*/
-
+	
 				if (MyGM->AvailableEBullet.Num() > 0)
-				{
-					FireBullet();
-				}
+				{ FireBullet();}
 
 			Customui1 -= 1;
 
@@ -206,27 +199,23 @@ void ABaseFoe::WaveWait(float DeltaTime)
 
 void ABaseFoe::FireBullet()
 {
-	/*if (BulletName == "SpreadBullet") // nel caso di proiettile spread  dovro spararne più
-	{  // di uno in direzioni diverse
-
-
-
-	}
-	else*/
-	{
 
 		if (MyGM->AvailableEBullet.Num() > 0)
 		{	
 		AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
       	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
 		NewBull->Activate(SpawnLocation, GetActorRotation(), BulletName);
-		NewBull->SetOwner(this); // do al proiettile un riferimento a chi lo ha attivato
+		NewBull->SetOwner(this); // do al proiettile un riferimento a chi lo ha attivatoà
+
+		// controllo su Wait e posizione statica nemico
+		if (NewBull->GetWait() > Customf2) NewBull->SetWait(Customf2);
+
+		// 
+
 		MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
 		}
 		else UE_LOG(LogTemp, Error, TEXT("Nessun proiettile disponibile"));
-	}
-
-
+	
 }
 
 void ABaseFoe::WaveBack(float DeltaTime)
@@ -385,8 +374,8 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 
 		switch (MyRow->BulletKind)
 		{
-		case EBulletKind::EBK_Normal: BulletName = "NormalBullet"; break;
-		case EBulletKind::EBK_Laser:  BulletName = "LaserBullet";  break;
+		case EBulletKind::EBK_Normal: BulletName  = "NormalBullet"; break;
+		case EBulletKind::EBK_Laser:  BulletName  = "LaserBullet";  break;
 		case EBulletKind::EBK_Follow:   break;
 		case EBulletKind::EBK_Spiral:   break;
 		case EBulletKind::EBK_Spread:  BulletName = "SpreadBullet"; break;

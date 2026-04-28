@@ -43,6 +43,10 @@ class ZAXTON_API AEBullet : public AActor
 	APCamera* MyCamera;
 
 public:
+
+	float GetWait() { return Wait; };
+	void  SetWait(float newval) { Wait = newval; };
+
 	// Sets default values for this actor's properties
 	AEBullet();
 	//~APBullet();

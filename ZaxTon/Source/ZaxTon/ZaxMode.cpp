@@ -51,10 +51,8 @@ void AZaxMode::BeginPlay()
 			Effect->SetOwner(this);	
 			Effect->DeActivate(); 
 			//AvailableEffects.AddUnique(Effect);
-
-		  //  UE_LOG(LogTemp, Error, TEXT("Av Effects %i"), AvailableEffects.Num());
+		    //UE_LOG(LogTemp, Error, TEXT("Av Effects %i"), AvailableEffects.Num());
 		}
-
 	}
 
 	for (int i = 0; i < 200; i++) // creo tutti i proiettili per i nemici
@@ -65,12 +63,8 @@ void AZaxMode::BeginPlay()
 		{
 			Bullet->MyGM = this;
 			Bullet->DeActivate(); // disattiva e inserisce in array dei disponibili
-
 		}
-
-
 	}
-
 }
 
 void AZaxMode::Tick(float DeltaTime)
