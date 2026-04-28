@@ -202,17 +202,19 @@ void ABaseFoe::FireBullet()
 
 		if (MyGM->AvailableEBullet.Num() > 0)
 		{	
-		AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
+		//AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
+		LastBullet = MyGM->AvailableEBullet.Pop();
+
       	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
-		NewBull->Activate(SpawnLocation, GetActorRotation(), BulletName);
-		NewBull->SetOwner(this); // do al proiettile un riferimento a chi lo ha attivatoà
+		LastBullet->Activate(SpawnLocation, GetActorRotation(), BulletName);
+		LastBullet->SetOwner(this); // do al proiettile un riferimento a chi lo ha attivatoà
 
 		// controllo su Wait e posizione statica nemico
-		if (NewBull->GetWait() > Customf2) NewBull->SetWait(Customf2);
+		if (LastBullet->GetWait() > Customf2) LastBullet->SetWait(Customf2);
 
 		// 
 
-		MyGM->InUseEBullet.AddUnique(NewBull); // inserisco l'oggetto attivato nella lista in uso
+		MyGM->InUseEBullet.AddUnique(LastBullet); // inserisco l'oggetto attivato nella lista in uso
 		}
 		else UE_LOG(LogTemp, Error, TEXT("Nessun proiettile disponibile"));
 	
@@ -378,7 +380,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		case EBulletKind::EBK_Laser:  BulletName  = "LaserBullet";  break;
 		case EBulletKind::EBK_Follow:   break;
 		case EBulletKind::EBK_Spiral:   break;
-		case EBulletKind::EBK_Spread:  BulletName = "SpreadBullet"; break;
+		case EBulletKind::EBK_Spread: BulletName = "SpreadBullet"; break;
 		}
 
 
@@ -429,11 +431,13 @@ void ABaseFoe::SpawnDieEffect()
 
 void ABaseFoe::DeActivate()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("chiamo deactive"))
+	// nel caso del laser, quando il nemico si disattiva, si porta dietro il proiettile
+	if (BulletName == "LaserBullet" && LastBullet) LastBullet->DeActivate();
+
+	LastBullet = nullptr; // svuoo pointer per evitare riferimenti a vecchi proiettili precedenti
 
 	// disattivo collisione proiettile 
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// disattivo il tick

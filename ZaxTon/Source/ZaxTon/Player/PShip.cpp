@@ -317,31 +317,43 @@ void APShip::SpecialBullet()
 
 void APShip::ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
 	// nel caso di hit da corpo di un nemico o proiettile
 	// ricevo lo stesso danno 
-	if (Cast<ABaseFoe>(OtherActor) || Cast<AEBullet>(OtherActor))
-	{
-	
-		death = true;
-		SpawnDieEffect();
-	
-			numVit--;
-			SetActorLocation(FVector(MyCamera->GetActorLocation().X, MyCamera->GetActorLocation().Y, CamOffset.Z), true);
-			CamOffset = FVector(0, 0, CamOffset.Z);
-	
-		//SetActorLocation(CamOffset);
-		//death = true;
+	if (Cast<ABaseFoe>(OtherActor) || Cast<AEBullet>(OtherActor)) 
+	{ 
 		
-		Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		invs = true;
-		Body->SetHiddenInGame(invs);
-
-		GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn,this,&APShip::Respawn,0.5);
+		HitGeneral();
+	
+	
 	}
+}
+
+void APShip::HitGeneral()
+{
+	// per un overlap non è necessario ma siccome il trace prende anche oggetti in "no collsion"
+	// faccio in modo di uscire manualmente dalla gestione danni fin quando non ho ripristinato Query & Physics
+	if (Collision->GetCollisionEnabled() == ECollisionEnabled::NoCollision) return;
+
+	death = true;
+	SpawnDieEffect();
+
+	numVit--;
+	SetActorLocation(FVector(MyCamera->GetActorLocation().X, MyCamera->GetActorLocation().Y, CamOffset.Z), true);
+	CamOffset = FVector(0, 0, CamOffset.Z);
+
+	//SetActorLocation(CamOffset);
+	//death = true;
+
+	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	invs = true;
+	Body->SetHiddenInGame(invs);
+
+	GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn, this, &APShip::Respawn, 0.5);
 
 }
 
+
+ // questa funzione alterna visibile e non visibile per 20 volte
 void APShip::Respawn()
 {
 

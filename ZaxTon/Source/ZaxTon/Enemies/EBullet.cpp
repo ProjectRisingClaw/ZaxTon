@@ -191,11 +191,11 @@ void AEBullet::UpdateLoc(float DeltaTime)
 	{
 
 	case EBulletKind::EBK_Follow:
-	break;
+		break;
 	case EBulletKind::EBK_Spiral:
-	break;
+		break;
 	case EBulletKind::EBK_Laser:
-
+	{
 
 		FVector StartPoint{ GetOwner()->GetActorLocation() };
 
@@ -205,38 +205,61 @@ void AEBullet::UpdateLoc(float DeltaTime)
 		switch (substate)
 		{
 		case 0: // avanzo fino a raggiungere la distanza desiderata
+		
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 
-		FVector Diff{ GetActorLocation() - StartPoint };
-		if (Diff.Size() > Distance)
-		{ 
-			substate = 1;
-			Vel = MyCamera->GetVel();
-		}
+			FVector Diff{ GetActorLocation() - StartPoint };
+			if (Diff.Size() > Distance)
+			{
+				substate = 1;
+				Vel = MyCamera->GetVel();
+			}
 
-		//Distance 
+			//Distance 
 
 		break;
-
 
 		case 1: // attivo il counter e aspetto il tempo di wait
-	
+
 			SetActorLocation(GetActorLocation() + MyCamera->GetActorUpVector() * DeltaTime * Vel);
-			
-		break;
+
+			break;
 
 		case 2: // mi disattivo 
 			DeActivate();
-		break;
+			break;
 
 		}
 
-     
-		
-	VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
-	VfxComp->SetVariableVec3("StartPoint", StartPoint);
-	
 
+
+		// controllo di collisione tra i due punti con linetrace
+		FHitResult MyHit; // variabile contenitore di informazioni sull'oggetto colpito
+		// la passero per riferimento e la funzione  ci inserirà i dati necessari
+
+		//FCollisionQueryParams Parametri;
+
+		//Parametri.AddIgnoredActors(Cast<AActor>(MyGM->InUse));
+
+		bool Hitsomething = GetWorld()->LineTraceSingleByChannel(
+			MyHit,
+			StartPoint,      // punti di inziio e fine per riferimento ma const
+			GetActorLocation(), // serve solo a non copiare la variabile, il limite è che non posso mettere direttamente un valore
+			ECC_Visibility);
+
+		if (Hitsomething)
+		{
+			//UE_LOG(LogTemp, Error, TEXT("Hit Something %s"), *MyHit.GetActor()->GetName());
+			APShip* ToDestroy{ Cast<APShip>(MyHit.GetActor()) };
+			if (ToDestroy) ToDestroy->HitGeneral();
+
+		}
+
+		// aggiornamento grafico dei particellari
+		VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
+		VfxComp->SetVariableVec3("StartPoint", StartPoint);
+
+	}
     break;
 	
 	default:

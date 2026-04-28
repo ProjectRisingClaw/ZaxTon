@@ -10,6 +10,7 @@
 class USphereComponent;
 class AZaxMode;
 class APCamera;
+class AEBullet;
 
 UCLASS()
 class ZAXTON_API ABaseFoe : public AActor
@@ -88,6 +89,10 @@ class ZAXTON_API ABaseFoe : public AActor
 	void ResetMaterial();
 
 	float ContLum{ 1.f };
+
+	// memorizzo in questo pointer l'ultimo proiettile sparato
+	AEBullet* LastBullet{ nullptr };
+
 public:	
 
 	FORCEINLINE void SetCustom3(float NewVal) { Customf3 = NewVal; };
