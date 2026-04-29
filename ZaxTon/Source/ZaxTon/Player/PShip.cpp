@@ -61,6 +61,9 @@ APShip::APShip()
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SetRootComponent(Collision);
 
+
+	Collision->SetCollisionResponseToChannel(ECC_PLAYER,ECollisionResponse::ECR_Overlap);
+
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
 

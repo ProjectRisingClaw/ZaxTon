@@ -6,7 +6,6 @@
 #include "BaseFoe.h" // includo il nemico per poterlo colpire
 #include "Components/SphereComponent.h"
 #include "ZaxTon/Headers/DataTables.h" 
-#include "ZaxTon/Headers/Enumerators.h"
 #include "ZaxTon/ZaxMode.h" 
 // gestione particellari
 #include "NiagaraComponent.h"
@@ -241,11 +240,17 @@ void AEBullet::UpdateLoc(float DeltaTime)
 
 		//Parametri.AddIgnoredActors(Cast<AActor>(MyGM->InUse));
 
+		//GetWorld()->SweepSingleByChannel(,);
+
+		//GetWorld()->LineTrace
+
 		bool Hitsomething = GetWorld()->LineTraceSingleByChannel(
 			MyHit,
 			StartPoint,      // punti di inziio e fine per riferimento ma const
 			GetActorLocation(), // serve solo a non copiare la variabile, il limite è che non posso mettere direttamente un valore
-			ECC_Visibility);
+			ECC_PLAYER);// ECC_PLAYER
+
+		
 
 		if (Hitsomething)
 		{

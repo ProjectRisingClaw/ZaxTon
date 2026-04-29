@@ -4,6 +4,11 @@
 #include "NiagaraSystem.h"
 #include "DataTables.generated.h"
 
+
+#define ECC_PLAYER ECC_EngineTraceChannel1
+
+
+
 USTRUCT(BlueprintType)
 struct FEnemyTableRaw : public FTableRowBase
 {

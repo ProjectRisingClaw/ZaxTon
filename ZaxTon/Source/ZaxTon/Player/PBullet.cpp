@@ -6,7 +6,6 @@
 #include "ZaxTon/Enemies/BaseFoe.h" // includo il nemico per poterlo colpire
 #include "Components/SphereComponent.h"
 #include "ZaxTon/Headers/DataTables.h" 
-#include "ZaxTon/Headers/Enumerators.h"
 #include "ZaxTon/ZaxMode.h"
 #include "ZaxTon/Effects/Explosion.h" // include per l'actor che gestisce esplosioni semplici
 // gestione particellari

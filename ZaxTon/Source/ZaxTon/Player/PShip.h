@@ -23,9 +23,12 @@ class ZAXTON_API APShip : public APawn
 	// un solo putatore creato non vuol dire
 	// avere il componente, è solo il contenitore
 	// componente static mesh
+	UPROPERTY(VisibleAnyWhere)
 	UStaticMeshComponent*    Body{ nullptr };
 	//UStaticMeshComponent* Body = nullptr;
 
+
+	UPROPERTY(VisibleAnyWhere)
 	USphereComponent* Collision{ nullptr };
 
 	UNiagaraSystem* ExplosionEffect{ nullptr };
