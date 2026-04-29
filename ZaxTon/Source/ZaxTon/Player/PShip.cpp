@@ -62,10 +62,14 @@ APShip::APShip()
 	SetRootComponent(Collision);
 
 
-	Collision->SetCollisionResponseToChannel(ECC_PLAYER,ECollisionResponse::ECR_Overlap);
+
+
+	//Collision->SetCollisionResponseToChannel(ECC_PLAYER,ECollisionResponse::ECR_Block);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
+	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Body->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	auto Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
 
@@ -126,6 +130,18 @@ void APShip::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+	Collision->SetCollisionProfileName(TEXT("Custom"));
+	Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	//Collision->SetCollisionObjectType(ECC_WorldDynamic); // o quello che usi
+	Collision->SetCollisionResponseToAllChannels(ECR_Ignore); // parti da zero
+	Collision->SetCollisionResponseToChannel(ECC_PLAYER, ECR_Block);
+
+
+
+	// Verifica subito dopo
+	UE_LOG(LogTemp, Warning, TEXT("Response dopo set: %d"),
+		(int32)Collision->GetCollisionResponseToChannel(ECC_PLAYER));
 	// il fire rate messo come vaolre iniziale si intende in 
 	// proiettil ial secondo. qui lo ricaloclolo come 1/ numero di proiettili
 	FireRate = 1 / FireRate;
