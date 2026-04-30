@@ -75,6 +75,8 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 
 	// disattivo collisione proiettile 
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// deve vedere il giocatore come overlap
+	Collision->SetCollisionResponseToChannel(ECC_ENEMY_OBJ, ECR_Overlap);
 
 	//PrimaryActorTick.bCanEverTick = true;
 	// nascondo grafica del proiettile

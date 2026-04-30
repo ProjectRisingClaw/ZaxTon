@@ -17,6 +17,11 @@ ABaseFoe::ABaseFoe()
 
 	// pointer                         tipo da creare          // nome scelto
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	// definisco il collision object type del nemico
+	Collision->SetCollisionObjectType(ECC_ENEMY_OBJ);
+	// deve vedere il giocatore come overlap
+	Collision->SetCollisionResponseToChannel(ECC_PLAYER_OBJ, ECR_Overlap);
+
 	SetRootComponent(Collision);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
@@ -93,6 +98,7 @@ void ABaseFoe::UpdateLoc(float DeltaTime)
 	case EWaveMode::EWM_Sinus:    WaveSinus(DeltaTime);    break;
 	case EWaveMode::EWM_Wait:     WaveWait(DeltaTime);     break;
 	case EWaveMode::EWM_Back:     WaveBack(DeltaTime);     break;
+	case EWaveMode::EWM_Spin:     WaveSpin(DeltaTime);     break;
 	}
 
 	if (GetWorldTimerManager().IsTimerActive(TempTimer)){
@@ -197,27 +203,85 @@ void ABaseFoe::WaveWait(float DeltaTime)
 	//MyGM->MyCamera;
 }
 
-void ABaseFoe::FireBullet()
+void ABaseFoe::WaveSpin(float DeltaTime)
 {
-
-		if (MyGM->AvailableEBullet.Num() > 0)
-		{	
-		//AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
-		LastBullet = MyGM->AvailableEBullet.Pop();
-
-      	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
-		LastBullet->Activate(SpawnLocation, GetActorRotation(), BulletName);
-		LastBullet->SetOwner(this); // do al proiettile un riferimento a chi lo ha attivatoà
-
-		// controllo su Wait e posizione statica nemico
-		if (LastBullet->GetWait() > Customf2) LastBullet->SetWait(Customf2);
-
-		// 
-
-		MyGM->InUseEBullet.AddUnique(LastBullet); // inserisco l'oggetto attivato nella lista in uso
-		}
-		else UE_LOG(LogTemp, Error, TEXT("Nessun proiettile disponibile"));
+	// va dritto ma entrato nello schermo, per un tempo
+	// deciso da noi smette di avanzare (va alla velocità della camera)
+	// poi prosegue
 	
+
+	// Customf1  - Distanza dalla camera a cui fermarsi
+	// Customf2  - tempo complessivo di attesa in wait
+	// Customf3  - intervallo tempo per sparare
+	// Customf4  - vel  rotazione
+
+	switch (SubState)
+	{
+	case 0:
+	{
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+
+		double Dist{ abs(MyCamera->GetActorLocation().X - GetActorLocation().X) };
+		//+ Customf1
+		if (Dist < Customf1)
+		{
+			SubState = 1;
+			Vel = MyCamera->GetVel(); // velocità uguale e contraria alla camera
+			//UE_LOG(LogTemp, Error, TEXT("Cambio stato!"));
+
+			BaseOrientation = GetActorQuat(); // prima di cambiare sottostato
+			// memoirzzo orientamento attuale in Quat
+			CurrentLoopAngle = 0; // l'angolazione iiziale a zero
+ 		}
+
+	}
+	break; // avanza fino ad una certa distanza dal centro visuale
+
+
+	case 1: // in questo stato è fermo ed è qui che dovrà sparare
+
+		// ruoto usando i QUAT
+		CurrentLoopAngle += DeltaTime * FMath::DegreesToRadians(Customf4);
+
+		FQuat LoopRotation{ GetActorUpVector(),CurrentLoopAngle};
+		// calcolo l'orientamento complessivo
+		// per farlo con i quat, mi basta
+		// moltiplicare l'orientamento su un asse per quello 
+		//dello sguardo originale
+		FQuat FinalOrientation{ LoopRotation * BaseOrientation };
+		// assegno l'orientamento calcolato
+		SetActorRotation(FinalOrientation);
+
+		// scala il tempo in cui stare fermo
+		Customf2 -= DeltaTime;
+
+		if (Customf2 > 0)
+		{   // si mette in lock con la camera
+			SetActorLocation(GetActorLocation() + MyCamera->GetActorUpVector() * DeltaTime * Vel);
+		}
+		else { Vel = 400.f; SubState = 2; } // assegno nuovamente velcoita in avanti
+
+		// gestione spawn dei proiettili ( se ci sono proiettili )
+
+		if (Counter > 0) Counter -= DeltaTime;
+		else
+		{
+			if (MyGM->AvailableEBullet.Num() > 0)
+			{
+				FireBullet();
+			}
+			Counter = Customf3; // rimetto il contaatore alla dimensione del Dealy
+		}
+
+		break; // sta fermo per un certo periodo (eventualmente spara)
+
+
+	case 2:
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		break; // riprende ad avanzare e successivamente esce dallo schermo
+
+	}
+	//MyGM->MyCamera;
 }
 
 void ABaseFoe::WaveBack(float DeltaTime)
@@ -225,6 +289,10 @@ void ABaseFoe::WaveBack(float DeltaTime)
 	// una volta che è arrivato a fondo schermo anche senza uscire
 	// una volta uscito dallo schermo in basso torna indietro 
 	// ed esce dalla parte alta
+
+	// customf1 distanzatra noi e la camera sotto la quale si passa di stato
+	// Customf2 offset per calcolare la distanza
+	// Customf3  gradi da ruotare prima di smettere (360 gradi rotazione completa)
 
 	switch (SubState)
 	{
@@ -323,6 +391,33 @@ void ABaseFoe::WaveBack(float DeltaTime)
 	}
 }
 
+
+
+
+void ABaseFoe::FireBullet()
+{
+
+		if (MyGM->AvailableEBullet.Num() > 0)
+		{	
+		//AEBullet* NewBull{ MyGM->AvailableEBullet.Pop() };
+		LastBullet = MyGM->AvailableEBullet.Pop();
+
+      	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 };
+		LastBullet->Activate(SpawnLocation, GetActorRotation(), BulletName);
+		LastBullet->SetOwner(this); // do al proiettile un riferimento a chi lo ha attivatoà
+
+		// controllo su Wait e posizione statica nemico
+		if (LastBullet->GetWait() > Customf2) LastBullet->SetWait(Customf2);
+
+		// 
+
+		MyGM->InUseEBullet.AddUnique(LastBullet); // inserisco l'oggetto attivato nella lista in uso
+		}
+		else UE_LOG(LogTemp, Error, TEXT("Nessun proiettile disponibile"));
+	
+}
+
+
 // 
 void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName NewType)
 {
@@ -373,17 +468,6 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		Customui1 = MyRow->BulletNumber; // numero di colpi da sparare
 		Customf3  = MyRow->BulletDelay;  //tempo tra un colpo e l'altro
 
-
-		switch (MyRow->BulletKind)
-		{
-		case EBulletKind::EBK_Normal: BulletName  = "NormalBullet"; break;
-		case EBulletKind::EBK_Laser:  BulletName  = "LaserBullet";  break;
-		case EBulletKind::EBK_Follow:   break;
-		case EBulletKind::EBK_Spiral:   break;
-		case EBulletKind::EBK_Spread: BulletName = "SpreadBullet"; break;
-		}
-
-
 		break;
 
 		case EWaveMode::EWM_Back:
@@ -396,7 +480,26 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		break;
 
 
+		case EWaveMode::EWM_Spin:
+			Customf1 = MyRow->CamDistance;
+			Customf2 = MyRow->EnemyDelay;
+			Customf3 = MyRow->BulletDelay;
+			Customf4 = MyRow->RotationSpeed;
+	    break;
 		}
+
+		// il proiettile lo setto in ogni caso per tutti
+		// se non viene usato no nsuccede nulla
+		switch (MyRow->BulletKind)
+		{
+		case EBulletKind::EBK_Normal: BulletName = "NormalBullet"; break;
+		case EBulletKind::EBK_Laser:  BulletName = "LaserBullet";  break;
+		case EBulletKind::EBK_Follow:   break;
+		case EBulletKind::EBK_Spiral:   break;
+		case EBulletKind::EBK_Spread: BulletName = "SpreadBullet"; break;
+			//case EBulletKind::EBK_: BulletName = "SpreadBullet"; break;
+		}
+
 
 
 	}

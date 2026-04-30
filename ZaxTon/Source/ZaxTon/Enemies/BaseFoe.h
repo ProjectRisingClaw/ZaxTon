@@ -127,6 +127,8 @@ public:
 
 	void WaveWait(float DeltaTime);
 
+	void WaveSpin(float DeltaTime);
+
 	void FireBullet();
 
 	void WaveBack(float DeltaTime);

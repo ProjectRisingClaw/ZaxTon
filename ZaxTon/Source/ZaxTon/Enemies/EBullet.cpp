@@ -23,6 +23,10 @@ AEBullet::AEBullet()
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	Collision->SetSphereRadius(26);
 	Collision->SetHiddenInGame(true);
+	// tipo di obj per il proiettile
+	Collision->SetCollisionObjectType(ECC_ENEMY_OBJ);
+	// deve vedere il giocatore come overlap
+	Collision->SetCollisionResponseToChannel(ECC_PLAYER_OBJ, ECR_Overlap);
 
 	SetRootComponent(Collision);
 
@@ -45,6 +49,8 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 {
 
 	// controlla la riga della tabella e carica dati
+
+	UE_LOG(LogTemp,Error,TEXT("proiettile attivato = %s") , *AttackType.ToString())
 
 	FBulletTableRaw* MyRow{ MyDT->FindRow<FBulletTableRaw>(AttackType,TEXT("Context")) };
 
@@ -98,6 +104,7 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	else
 	{
 		Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		//Collision->SetCollisionObjectType(ECC_ENEMY_OBJ);
 		//PrimaryActorTick.bCanEverTick = true;
 		// nascondo grafica del proiettile
 		Body->SetHiddenInGame(false);

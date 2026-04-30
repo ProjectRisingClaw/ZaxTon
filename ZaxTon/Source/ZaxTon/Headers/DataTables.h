@@ -34,12 +34,12 @@ struct FEnemyTableRaw : public FTableRowBase
 
 	// distanza dalla camera a cui fermarsi in modalità Wait
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
-		meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait || WaveMode ==  EWaveMode::EWM_Back", EditConditionHides) )
+		meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait || WaveMode ==  EWaveMode::EWM_Back || WaveMode ==  EWaveMode::EWM_Spin", EditConditionHides) )
 	float CamDistance{ 300 };
 
 	// variabile da sfruttare per definire un tempo limitato
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
-		meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
+		meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait  || WaveMode ==  EWaveMode::EWM_Spin", EditConditionHides))
 	float EnemyDelay{ 1.f };
 
 	/* Valore utilizzato per identificar eun punto ad un certa distanza dalla camera (di solito asse X) */
@@ -63,7 +63,7 @@ struct FEnemyTableRaw : public FTableRowBase
 
 	/* 360 significa che si compie una rivoluzione completa in 1 secondo*/
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
-	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Back", EditConditionHides))
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Back  || WaveMode ==  EWaveMode::EWM_Spin", EditConditionHides))
 	float RotationSpeed{ 360.f };
 
 	// numero di proiettili, con zero non spara
@@ -74,11 +74,11 @@ struct FEnemyTableRaw : public FTableRowBase
 	uint8 BulletNumber{ 0 };
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
-	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait || WaveMode ==  EWaveMode::EWM_Spin", EditConditionHides))
 	float BulletDelay{ 0.2f }; // tempo che intercorre tra un proiettile e l'altro
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
-	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait || WaveMode ==  EWaveMode::EWM_Spin", EditConditionHides))
 	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)

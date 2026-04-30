@@ -65,11 +65,12 @@ APShip::APShip()
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	//Collision->SetCollisionObjectType(ECC_WorldDynamic); // o quello che usi
 	Collision->SetCollisionResponseToAllChannels(ECR_Ignore); // parti da zero
+
+	// per subire un line tracing il canale corrispondente va su block
 	Collision->SetCollisionResponseToChannel(ECC_PLAYER_TRACE, ECR_Block);
-
-	Collision->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
-
-	
+	// in overlap l'object type "nemico"
+	Collision->SetCollisionResponseToChannel(ECC_ENEMY_OBJ, ECR_Overlap);
+	// mi inserisco nella lista oggetti di tipo player
 	Collision->SetCollisionObjectType(ECC_PLAYER_OBJ);
 
 	//Collision->SetCollisionResponseToChannel(ECC_PLAYER,ECollisionResponse::ECR_Block);
@@ -342,11 +343,8 @@ void APShip::ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	// nel caso di hit da corpo di un nemico o proiettile
 	// ricevo lo stesso danno 
 	if (Cast<ABaseFoe>(OtherActor) || Cast<AEBullet>(OtherActor)) 
-	{ 
-		
+	{ 	
 		HitGeneral();
-	
-	
 	}
 }
 

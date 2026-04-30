@@ -43,7 +43,7 @@ public:
 	EEnemyType EnemyType{ EEnemyType::EET_NemicoA };
 
 
-	FName TipiNemici[10]{ "NemicoA","NemicoB","NemicoC","NemicoD","NemicoE","","","","","" };
+	FName TipiNemici[10]{ "NemicoA","NemicoB","NemicoC","NemicoD","NemicoE","NemicoF","","","","" };
 
 
 	UFUNCTION()

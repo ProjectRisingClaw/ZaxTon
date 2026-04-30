@@ -9,6 +9,7 @@ enum class EEnemyType : uint8
 	EET_NemicoC UMETA(DisplayName = "Nemico C"),
 	EET_NemicoD UMETA(DisplayName = "Nemico D"),
 	EET_NemicoE UMETA(DisplayName = "Nemico E"),
+	EET_NemicoF UMETA(DisplayName = "Nemico F"),
 	EET_MAX     UMETA(DisplayName = "MAX")
 
 };
@@ -32,6 +33,7 @@ enum class EWaveMode : uint8
 	EWM_Sinus    UMETA(DisplayName = "Sinus"),
 	EWM_Wait     UMETA(DisplayName = "Wait"),
 	EWM_Back     UMETA(DisplayName = "Back"),
+	EWM_Spin     UMETA(DisplayName = "Spin"),
 	EWM_MAX      UMETA(DisplayName = "MAX")
 
 };
