@@ -61,10 +61,19 @@ APShip::APShip()
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SetRootComponent(Collision);
 
+	Collision->SetCollisionProfileName(TEXT("Custom"));
+	Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	//Collision->SetCollisionObjectType(ECC_WorldDynamic); // o quello che usi
+	Collision->SetCollisionResponseToAllChannels(ECR_Ignore); // parti da zero
+	Collision->SetCollisionResponseToChannel(ECC_PLAYER_TRACE, ECR_Block);
 
+	Collision->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
 
+	
+	Collision->SetCollisionObjectType(ECC_PLAYER_OBJ);
 
 	//Collision->SetCollisionResponseToChannel(ECC_PLAYER,ECollisionResponse::ECR_Block);
+	
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
@@ -131,17 +140,11 @@ void APShip::BeginPlay()
 	Super::BeginPlay();
 
 	
-	Collision->SetCollisionProfileName(TEXT("Custom"));
-	Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	//Collision->SetCollisionObjectType(ECC_WorldDynamic); // o quello che usi
-	Collision->SetCollisionResponseToAllChannels(ECR_Ignore); // parti da zero
-	Collision->SetCollisionResponseToChannel(ECC_PLAYER, ECR_Block);
-
 
 
 	// Verifica subito dopo
-	UE_LOG(LogTemp, Warning, TEXT("Response dopo set: %d"),
-		(int32)Collision->GetCollisionResponseToChannel(ECC_PLAYER));
+	//UE_LOG(LogTemp, Warning, TEXT("Response dopo set: %d"),
+		//(int32)Collision->GetCollisionResponseToChannel(ECC_PLAYER_TRACE));
 	// il fire rate messo come vaolre iniziale si intende in 
 	// proiettil ial secondo. qui lo ricaloclolo come 1/ numero di proiettili
 	FireRate = 1 / FireRate;

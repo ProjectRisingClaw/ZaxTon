@@ -4,9 +4,10 @@
 #include "NiagaraSystem.h"
 #include "DataTables.generated.h"
 
-
-#define ECC_PLAYER ECC_EngineTraceChannel1
-
+#define ECC_PLAYER_TRACE ECC_GameTraceChannel1
+#define ECC_PLAYER_OBJ   ECC_GameTraceChannel2
+#define ECC_ENEMY_OBJ    ECC_GameTraceChannel3
+#define ECC_ENEMY_TRACE  ECC_GameTraceChannel4
 
 
 USTRUCT(BlueprintType)

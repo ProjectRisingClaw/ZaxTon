@@ -248,7 +248,7 @@ void AEBullet::UpdateLoc(float DeltaTime)
 			MyHit,
 			StartPoint,      // punti di inziio e fine per riferimento ma const
 			GetActorLocation(), // serve solo a non copiare la variabile, il limite è che non posso mettere direttamente un valore
-			ECC_PLAYER);// ECC_PLAYER
+			ECC_PLAYER_TRACE);// ECC_PLAYER
 
 		
 
