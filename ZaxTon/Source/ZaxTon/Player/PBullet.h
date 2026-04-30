@@ -10,6 +10,7 @@ class USphereComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class AZaxMode;
+class ABaseFoe;
 
 UCLASS()
 class ZAXTON_API APBullet : public AActor
@@ -33,7 +34,10 @@ class ZAXTON_API APBullet : public AActor
 
 	UDataTable* MyDT{ nullptr }; // Data Table da cui prendere i dati del proiettile
 
-	
+	// se vero attivo opzione di inseguimento avversario
+	bool      bFollow{ false };
+	uint8     substate{ 0 }; // per scandire le varie fasi dell'attacco a inseguimento
+	ABaseFoe* Target{ nullptr }; // l'eventuale obbiettivo da seguire
 
 	//FName TipiNemici[10]{ "NemicoA","NemicoB","NemicoC","NemicoD","NemicoE","","","","","" };
 
@@ -44,9 +48,13 @@ public:
 	// tempo prima di disattivarsi
 	float Durata{ 1.5f };
 
+	float Timer{ 0.3f }; // timer generico multi purpose
+
 	// attiva grafica e fisica del proiettile
 	// da richiamare qunado estratto dalla pool
 	void Activate(FVector SpawnLocation,FRotator SpawnRotation, FName AttackType = "NormalBullet");
+
+	
 
 	// disattiva grafica e fisica del proiettile
 	// quando ri messo da parte nella pool
@@ -61,6 +69,8 @@ protected:
 
 	UFUNCTION() // forzato per ogni funzione di cui fare bind
 	void HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	ABaseFoe* GetRandomActiveEnemy();
 
 public:	
 	// Called every frame

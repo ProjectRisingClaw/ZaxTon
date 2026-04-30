@@ -57,8 +57,22 @@ APBullet::APBullet()
 void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName AttackType)
 {
 
-	// controlla la riga della tabella e carica dati
+	// flag che indica se attivare inseguimento per questo proiettile
+	if (AttackType == "SpecialBullet")
+	{
+		bFollow = true;
+		Durata = 4.f; // ripristino durata proiettile
+		Timer = 0.3f; // il tempo da passare andando dritto
+	}
+	else
+	{
+		bFollow = false;
+		Durata = 1.f;
+	}
 
+	substate = 0; // reset del sotto stato
+
+	// controlla la riga della tabella e carica dati
 	FBulletTableRaw* MyRow{ MyDT->FindRow<FBulletTableRaw>(AttackType,TEXT("Context")) };
 
 	if (MyRow) // ad ogni activate carico dati dalla tabella
@@ -84,7 +98,7 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	// posiziono l'ogggetto in una zona lontana da quella di azione
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
-	Durata = 1; // ripristino durata proiettile
+
 
 	VfxComp->SetVariableVec3("StartPoint", GetActorLocation());
 	//VfxComp->SetVariableVec3("StartPoint", GetActorLocation());
@@ -162,17 +176,74 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 }
 
 
+ABaseFoe* APBullet::GetRandomActiveEnemy()
+{
+	int8 Size{ int8(MyGM->InUse.Num()) };
+
+	if (Size > 0)
+	{ 
+		return MyGM->InUse[FMath::RandRange(0, Size - 1)];
+
+	}
+    else return nullptr;
+}
+
+
 void APBullet::UpdateLoc(float DeltaTime)
 {
+
 	if (Durata > 0)
 	{
 		Durata -= DeltaTime;
 
-		float Lunghezza{ (1.f - Durata) * 500.f };
-		
-		VfxComp->SetVariableVec3("StartPoint", GetActorLocation() - GetActorForwardVector() * Lunghezza);
-		VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
-		SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		if (bFollow)
+		{  // gestisco inseguimento nemico più vicino
+			switch (substate)
+			{
+			case 0: // prosegue diritto per un tot di secondi
+			if (Timer > 0)Timer -= DeltaTime; else substate = 1;
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+			break;
+
+
+			case 1: // decide nemico da colpire
+			Target = GetRandomActiveEnemy();
+			substate = 2;
+			if (Target) UE_LOG(LogTemp, Warning, TEXT("My Target is %s"), *Target->GetName());
+
+			break;
+
+
+			case 2: // finche il nemico esiste lo insegue.
+				if (Target)
+				{
+
+
+
+			    } else substate = 1;
+			break;
+
+
+
+
+
+			}
+
+
+
+
+
+
+		}
+		else
+		{
+
+			float Lunghezza{ (1.f - Durata) * 500.f };
+			VfxComp->SetVariableVec3("StartPoint", GetActorLocation() - GetActorForwardVector() * Lunghezza);
+			VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+		}
+
 
 		
 	}
