@@ -11,6 +11,8 @@
 // gestione particellari
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "Kismet/KismetMathLibrary.h"
+
 
 // Sets default values
 APBullet::APBullet()
@@ -62,7 +64,7 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	{
 		bFollow = true;
 		Durata = 4.f; // ripristino durata proiettile
-		Timer = 0.3f; // il tempo da passare andando dritto
+		Timer  = 0.3f; // il tempo da passare andando dritto
 	}
 	else
 	{
@@ -201,6 +203,8 @@ void APBullet::UpdateLoc(float DeltaTime)
 			switch (substate)
 			{
 			case 0: // prosegue diritto per un tot di secondi
+
+			Target = nullptr;
 			if (Timer > 0)Timer -= DeltaTime; else substate = 1;
 			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 			break;
@@ -209,18 +213,32 @@ void APBullet::UpdateLoc(float DeltaTime)
 			case 1: // decide nemico da colpire
 			Target = GetRandomActiveEnemy();
 			substate = 2;
-			if (Target) UE_LOG(LogTemp, Warning, TEXT("My Target is %s"), *Target->GetName());
+			if (!Target) { substate = 0; Timer = 1;}
 
 			break;
 
 
 			case 2: // finche il nemico esiste lo insegue.
-				if (Target)
-				{
 
+				if (Target) 
+				{
+					//UE_LOG(LogTemp, Warning, TEXT("look for path"));
+
+					//Target->GetActorLocation();
+					//FRotator NewRot{ UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation()) };		
+					// trovo angolazione desiderata
+					FRotator NewRot((Target->GetActorLocation() - GetActorLocation()).Rotation());	
+					// ruoto ma lentamente
+					NewRot = FMath::RInterpConstantTo(GetActorRotation(), NewRot, DeltaTime,250);
+					SetActorRotation(NewRot);
+					SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel*2);
+
+					if (!MyGM->InUse.Contains(Target))
+					{ Target = nullptr; }
 
 
 			    } else substate = 1;
+
 			break;
 
 
@@ -235,7 +253,7 @@ void APBullet::UpdateLoc(float DeltaTime)
 
 
 		}
-		else
+		else  // proiettile normale va semplicemente diritto
 		{
 
 			float Lunghezza{ (1.f - Durata) * 500.f };

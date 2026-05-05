@@ -317,7 +317,7 @@ void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void APShip::SpecialBullet()
 {
-	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() * 100 }; // trovo posizione spawn
+	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() *20 }; // trovo posizione spawn
 	//classe  // riferimento uclass    // locazione   // rotazione di spawn
 	//GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass(), SpawnLocation, GetActorRotation());
 
@@ -327,11 +327,33 @@ void APShip::SpecialBullet()
 	if (Available.Num() > 0) // se c'è almeno un elemento
 	{
 		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
-		NewBull->Activate(SpawnLocation, GetActorRotation(),"SpecialBullet"); // attivo oggetto posizionandolo
+		NewBull->Activate(SpawnLocation, GetActorRotation()+FRotator(0,45,0), "SpecialBullet"); // attivo oggetto posizionandolo
 		// nella locazione desiderata
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+	}
 
+	if (Available.Num() > 0) // se c'è almeno un elemento
+	{
+		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(0, -45, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		// nella locazione desiderata
+		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+	}
 
+	if (Available.Num() > 0) // se c'è almeno un elemento
+	{
+		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(0, 80, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		// nella locazione desiderata
+		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+	}
+
+	if (Available.Num() > 0) // se c'è almeno un elemento
+	{
+		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(0, -80, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		// nella locazione desiderata
+		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
 	}
 
 }
