@@ -191,6 +191,27 @@ ABaseFoe* APBullet::GetRandomActiveEnemy()
 }
 
 
+ABaseFoe* APBullet::GetCloseActiveEnemy()
+{
+
+	ABaseFoe* TargetOut  { nullptr };
+	float     MinDistance{ 5000000 };
+
+	for (int i = 0; i < MyGM->InUse.Num(); i++)
+	{
+		float TempDist = (GetActorLocation() - MyGM->InUse[i]->GetActorLocation()).Size();
+	
+		if (TempDist < MinDistance)
+		{
+			MinDistance = TempDist;
+			TargetOut = MyGM->InUse[i];
+		}
+	}
+
+	return TargetOut;
+}
+
+
 void APBullet::UpdateLoc(float DeltaTime)
 {
 
@@ -211,9 +232,9 @@ void APBullet::UpdateLoc(float DeltaTime)
 
 
 			case 1: // decide nemico da colpire
-			Target = GetRandomActiveEnemy();
+			Target = GetCloseActiveEnemy();
 			substate = 2;
-			if (!Target) { substate = 0; Timer = 1;}
+			if (!Target) { substate = 0; Timer = 1.f;}
 
 			break;
 
@@ -229,7 +250,7 @@ void APBullet::UpdateLoc(float DeltaTime)
 					// trovo angolazione desiderata
 					FRotator NewRot((Target->GetActorLocation() - GetActorLocation()).Rotation());	
 					// ruoto ma lentamente
-					NewRot = FMath::RInterpConstantTo(GetActorRotation(), NewRot, DeltaTime,250);
+					NewRot = FMath::RInterpConstantTo(GetActorRotation(), NewRot, DeltaTime,350);
 					SetActorRotation(NewRot);
 					SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel*2);
 

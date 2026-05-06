@@ -72,6 +72,8 @@ protected:
 
 	ABaseFoe* GetRandomActiveEnemy();
 
+	ABaseFoe* GetCloseActiveEnemy();
+
 public:	
 	// Called every frame
 
