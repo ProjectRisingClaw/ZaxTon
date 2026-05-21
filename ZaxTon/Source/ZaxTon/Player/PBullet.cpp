@@ -63,8 +63,8 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	if (AttackType == "SpecialBullet")
 	{
 		bFollow = true;
-		Durata = 4.f; // ripristino durata proiettile
-		Timer  = 0.3f; // il tempo da passare andando dritto
+		Durata = 4.2f; // ripristino durata proiettile
+		Timer  = 0.22f; // il tempo da passare andando dritto
 	}
 	else
 	{
@@ -227,7 +227,12 @@ void APBullet::UpdateLoc(float DeltaTime)
 
 			Target = nullptr;
 			if (Timer > 0)Timer -= DeltaTime; else substate = 1;
+
+			FRotator ActualRot{ GetActorRotation() };
+			ActualRot.Pitch = FMath::FInterpConstantTo(ActualRot.Pitch,0,DeltaTime,40);
 			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+			SetActorRotation(ActualRot);
+
 			break;
 
 
@@ -250,7 +255,7 @@ void APBullet::UpdateLoc(float DeltaTime)
 					// trovo angolazione desiderata
 					FRotator NewRot((Target->GetActorLocation() - GetActorLocation()).Rotation());	
 					// ruoto ma lentamente
-					NewRot = FMath::RInterpConstantTo(GetActorRotation(), NewRot, DeltaTime,350);
+					NewRot = FMath::RInterpConstantTo(GetActorRotation(), NewRot, DeltaTime,360);
 					SetActorRotation(NewRot);
 					SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel*2);
 
@@ -269,7 +274,9 @@ void APBullet::UpdateLoc(float DeltaTime)
 			}
 
 
-
+			//float Lunghezz{ (1.f - Durata) * 500.f };
+			VfxComp->SetVariableVec3("EndPoint", GetActorLocation() - GetActorForwardVector());
+			//VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
 
 
 

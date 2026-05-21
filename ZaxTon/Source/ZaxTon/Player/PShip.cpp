@@ -324,10 +324,14 @@ void APShip::SpecialBullet()
 	// per eseguire spawn dalla pool controllo che ci siano elementi disponibili e 
 	// nel caso li attivo posizionandoli nella locazione giusta
 
+	FRotator StartRot{ GetActorRotation() };
+
 	if (Available.Num() > 0) // se c'è almeno un elemento
 	{
+		//FRotator SpecificRot { StartRot +   }
+
 		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
-		NewBull->Activate(SpawnLocation, GetActorRotation()+FRotator(0,45,0), "SpecialBullet"); // attivo oggetto posizionandolo
+		NewBull->Activate(SpawnLocation, GetActorRotation()+FRotator(60,40,0), "SpecialBullet"); // attivo oggetto posizionandolo
 		// nella locazione desiderata
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
 	}
@@ -335,7 +339,7 @@ void APShip::SpecialBullet()
 	if (Available.Num() > 0) // se c'è almeno un elemento
 	{
 		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
-		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(0, -45, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(60, -40, 0), "SpecialBullet"); // attivo oggetto posizionandolo
 		// nella locazione desiderata
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
 	}
@@ -343,7 +347,7 @@ void APShip::SpecialBullet()
 	if (Available.Num() > 0) // se c'è almeno un elemento
 	{
 		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
-		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(0, 80, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(-50, 80, 0), "SpecialBullet"); // attivo oggetto posizionandolo
 		// nella locazione desiderata
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
 	}
@@ -351,7 +355,7 @@ void APShip::SpecialBullet()
 	if (Available.Num() > 0) // se c'è almeno un elemento
 	{
 		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
-		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(0, -80, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(-50, -80, 0), "SpecialBullet"); // attivo oggetto posizionandolo
 		// nella locazione desiderata
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
 	}
