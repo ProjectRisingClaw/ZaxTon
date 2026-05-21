@@ -45,11 +45,37 @@ static void InitDefaultKeys()
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::Gamepad_RightTrigger));
 }
 
+FLinearColor APShip::GetBarColor()
+{
+	//UE_LOG(LogTemp, Error, TEXT("Geting now"))
 
+    static float CL{ 0.f };
+	static FLinearColor SParkCol{ 1,0.2f,0.2f,1.f };
+	bool   change{ false };
+	//if (CL < 1.f) CL += 60 * GetWorld()->GetDeltaSeconds(); else CL = 0;
 
+	if (GetPowerPercent() >= 1.f)
+	{
+		if (CL > 2.f)
+		{
+			change = true;
+		}
+		else  CL += 400 * GetWorld()->GetDeltaSeconds();
+		
+		if (change)
+		{
+			SParkCol = FLinearColor(1, 0.2f, 0.2f, 1.f);
+			change = false;
+		}
+		//if (SParkCol  == FLinearColor(1, 0.2f, 0.2f, 1.f))
+			//SParkCol  = FLinearColor(1.f, 1.f, 1.f, 1.f);
+		//else SParkCol = FLinearColor(1, 0.2f, 0.2f, 1.f);
 
-
-
+		//float G{ float(FMath::FRandRange(1.f, 255.f)) };
+		return  SParkCol;
+	}
+	else return FLinearColor(0,0.2f,1.f,1.f);
+}
 
 // Sets default values
 APShip::APShip()

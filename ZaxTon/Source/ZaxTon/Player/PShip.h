@@ -73,18 +73,25 @@ class ZAXTON_API APShip : public APawn
 
 	float PosizioneZ{ 0.f };
 
-	
+	float PowerUp{ 0.f };
+	float PowerMax{ 10.f };
 	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
 	// mi serve un handle per poter spegnere il timer al momento del rilascio
 public:
 
-	void AddPower(float ToAdd) { PowerUp += ToAdd; };
+	
+	FORCEINLINE void AddPower(float ToAdd) { PowerUp = (PowerUp + ToAdd) > PowerMax ? PowerMax : PowerUp + ToAdd; };
 
+	UFUNCTION(BlueprintPure)
+	float GetPowerPercent(){ return (PowerUp / PowerMax); };
+
+	UFUNCTION(BlueprintPure)
+	FLinearColor GetBarColor();
 	// valore che deve aumentare se si distruggono nemici/ a 10 si può sparare l'attacco caricato
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float PowerUp{ 0.f };
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float PowerMax{ 10.f }; // valore necessario per attacco speciale
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	 // valore necessario per attacco speciale
 
 
 	// Sets default values for this pawn's properties
