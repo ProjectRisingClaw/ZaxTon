@@ -2,6 +2,7 @@
 #include "Engine/DataTable.h"
 #include "Enumerators.h"
 #include "NiagaraSystem.h"
+#include "Blueprint/UserWidget.h"
 #include "DataTables.generated.h"
 
 #define ECC_PLAYER_TRACE ECC_GameTraceChannel1
@@ -102,6 +103,10 @@ struct FPlayerTableRaw: public FTableRowBase
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	float Vel{ 1200.f };
+
+	// Istanza runtime del widget
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UUserWidget> HUDWidgetClass;
 
 };
 

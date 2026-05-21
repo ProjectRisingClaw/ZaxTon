@@ -133,6 +133,10 @@ APShip::APShip()
 	{
 		UE_LOG(LogTemp, Error, TEXT(" no mesh "));
 	}*/
+
+	
+	
+	
 }
 
 // Called when the game starts or when spawned
@@ -140,7 +144,17 @@ void APShip::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FPlayerTableRaw* MyRow{ MyDT->FindRow<FPlayerTableRaw>(FName("PlayerA"),TEXT("Context")) };
 	
+	if (MyRow->HUDWidgetClass)
+	{
+		UUserWidget* HUD = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), MyRow->HUDWidgetClass);
+
+		if (HUD)
+		{
+			HUD->AddToViewport();
+		}
+	}
 
 
 	// Verifica subito dopo
