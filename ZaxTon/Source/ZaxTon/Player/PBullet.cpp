@@ -167,7 +167,14 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		Effect->Activate(GetActorLocation(), FRotator(0), NSImpact);
 	}
 	
-	Foe->Hitted(); // informo il nemico di essere stato colpito, gestira lui rimozione HP
+	bool IsDead{ Foe->Hitted() }; // informo il nemico di essere stato colpito, gestira lui rimozione HP
+
+	if (IsDead) // se il nemico è morto incremento powerup sul giocatore
+	{
+		auto MyShip{ Cast<APShip>(GetOwner()) }; // controllo che Owner sia di tipo APShip
+		if (MyShip)MyShip->AddPower(2.f);
+
+	}
 
 	//Foe->HitPoint 
 

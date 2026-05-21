@@ -317,6 +317,10 @@ void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void APShip::SpecialBullet()
 {
+	if (PowerUp < PowerMax) return; // manca l'energia per l'attacco
+
+	PowerUp = 0; 
+
 	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() *20 }; // trovo posizione spawn
 	//classe  // riferimento uclass    // locazione   // rotazione di spawn
 	//GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass(), SpawnLocation, GetActorRotation());

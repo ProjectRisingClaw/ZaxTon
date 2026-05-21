@@ -117,7 +117,7 @@ protected:
 
 public:	
 	
-	void Hitted();
+	bool Hitted();
 
 	void UpdateLoc(float DeltaTime);
 

@@ -65,7 +65,7 @@ void ABaseFoe::BeginPlay()
 }
 
 
-void ABaseFoe::Hitted()
+bool ABaseFoe::Hitted()
 {
 	//UMaterialInstanceDynamic* Coso;
 	//Coso->Set
@@ -82,11 +82,16 @@ void ABaseFoe::Hitted()
 		//FTimerHandle TempTimer;
 		GetWorldTimerManager().SetTimer(TempTimer, this, &ABaseFoe::ResetMaterial, 0.1f);
 		HitPoint--;
+
+		return false;
 	}
 	else
 	{
 		SpawnDieEffect(); // effetto particellare esplosione
 		DeActivate();     // rimuovo nemico
+
+
+		return true;
 	}
 }
 

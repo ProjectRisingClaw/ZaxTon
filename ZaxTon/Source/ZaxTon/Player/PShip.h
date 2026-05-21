@@ -66,16 +66,23 @@ class ZAXTON_API APShip : public APawn
 
 	float FireTime{ 0.f }; // variabile counter , in sostituzione di un eventuale timer di unreal
 
-	int numVit{ 3 };
-	int sec{ 0 };
+	int  numVit{ 3 };
+	int  sec{ 0 };
 	bool invs{ true };
 	bool death{ false };
 
 	float PosizioneZ{ 0.f };
 
+	// valore che deve aumentare se si distruggono nemici/ a 10 si può sparare l'attacco caricato
+	float PowerUp{ 0.f };
+	float PowerMax{ 10.f }; // valore necessario per attacco speciale
+
 	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
 	// mi serve un handle per poter spegnere il timer al momento del rilascio
 public:
+
+	void AddPower(float ToAdd) { PowerUp += ToAdd; };
+
 	// Sets default values for this pawn's properties
 	APShip();
 
