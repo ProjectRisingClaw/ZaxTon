@@ -40,10 +40,17 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		{
 			//UE_LOG(LogTemp, Error, TEXT("Spawn"));
 
+			// disposizioni iniziali per nemici particolari
 			switch (EnemyType)
 			{
-	
-			case EEnemyType::EET_NemicoB: // per il nemico B passo i gradi inziali per la sinusoide
+
+			case EEnemyType::EET_Killer: // il nemico killer spara e va in spawn in linea orizzontale
+			case EEnemyType::EET_Bomber:
+				ToSpawn->Activate(GetActorLocation() - GetActorRightVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
+				ToSpawn->SetVel(Vel);
+			break;
+
+		   /* case EEnemyType:: // per il nemico B passo i gradi inziali per la sinusoide
 			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
 			ToSpawn->SetVel(Vel);
 			ToSpawn->SetCustom3(Phase * i);
@@ -53,7 +60,7 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 			case EEnemyType::EET_NemicoD: 
 			ToSpawn->Activate(GetActorLocation() - GetActorRightVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
 			ToSpawn->SetVel(Vel);
-			break;
+			break;*/
 
 			default:
 			ToSpawn->Activate(GetActorLocation() - GetActorForwardVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);

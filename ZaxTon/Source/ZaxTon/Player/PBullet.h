@@ -27,7 +27,7 @@ class ZAXTON_API APBullet : public AActor
 	// effetto persistente del proiettile
 	UNiagaraComponent*    VfxComp{ nullptr };
 
-	// effetto persistente del proiettile
+
 	UNiagaraSystem*       NSImpact{ nullptr };
 
 	float Vel{ 3500.f };
@@ -37,8 +37,9 @@ class ZAXTON_API APBullet : public AActor
 	// se vero attivo opzione di inseguimento avversario
 	bool      bFollow{ false };
 	uint8     substate{ 0 }; // per scandire le varie fasi dell'attacco a inseguimento
-	ABaseFoe* Target{ nullptr }; // l'eventuale obbiettivo da seguire
-
+	
+	//ABaseFoe* Target{ nullptr }; // l'eventuale obbiettivo da seguire
+	TObjectPtr<ABaseFoe> Target;
 	//FName TipiNemici[10]{ "NemicoA","NemicoB","NemicoC","NemicoD","NemicoE","","","","","" };
 
 public:	

@@ -55,10 +55,10 @@ class ZAXTON_API APShip : public APawn
 
 
 	UPROPERTY(EditAnyWhere) // limite di distanza DX SX con la camera 
-	float XLimit{ 1200.f };
+	float XLimit{ 1550.f };
 
 	UPROPERTY(EditAnyWhere) // limite di distanza avanti indietro dalla camera 
-	float YLimit{ 700.f };
+	float YLimit{ 760.f };
 
 	// vera se il fuco è attivo
 	bool  bFireOn{ false };
@@ -98,8 +98,10 @@ public:
 	APShip();
 
 	// gestione di pool per spawn proiettili
-	TArray<APBullet*> Available; // proiettili disponibili
-	TArray<APBullet*> InUse;     //proiettili correntemente in uso
+	TArray<TObjectPtr<APBullet>> Available; // proiettili disponibili
+	TArray<TObjectPtr<APBullet>> InUse;     //proiettili correntemente in uso
+	//TObjectPtr<APBullet>
+	//TPtr
 
 	// vettore che determina lo scarto tra la posizione della nave e l'actor usato
 	//vome camera. Se l'offset è 0 0 0 significa che la nave è nella stessa posizione della camera

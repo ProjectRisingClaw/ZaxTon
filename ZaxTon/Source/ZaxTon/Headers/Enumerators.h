@@ -1,16 +1,18 @@
 #pragma once
 
+//FName TipiNemici[10]{ "Striker","Eagle","Bomber","Ambush","Flip","Killer","Destroyer","XX","YY","ZZ" };
 
 UENUM(BlueprintType)
 enum class EEnemyType : uint8
 {
-	EET_NemicoA UMETA(DisplayName = "Nemico A"),
-	EET_NemicoB UMETA(DisplayName = "Nemico B"),
-	EET_NemicoC UMETA(DisplayName = "Nemico C"),
-	EET_NemicoD UMETA(DisplayName = "Nemico D"),
-	EET_NemicoE UMETA(DisplayName = "Nemico E"),
-	EET_NemicoF UMETA(DisplayName = "Nemico F"),
-	EET_MAX     UMETA(DisplayName = "MAX")
+	EET_Striker   UMETA(DisplayName = "Striker"),
+	EET_Eagle     UMETA(DisplayName = "Eagle"),
+	EET_Bomber    UMETA(DisplayName = "Bomber"),
+	EET_Ambush    UMETA(DisplayName = "Ambush"),
+	EET_Flip      UMETA(DisplayName = "Flip"),
+	EET_Killer    UMETA(DisplayName = "Killer"),
+	EET_Destroyer UMETA(DisplayName = "Destroyer"),
+	EET_MAX       UMETA(DisplayName = "MAX")
 
 };
 
@@ -59,6 +61,7 @@ enum class EBulletKind : uint8
 	EBK_Spiral   UMETA(DisplayName = "Spiral"), // un proiettile lento con traiettoria a spirale
 	EBK_Laser    UMETA(DisplayName = "Laser"), // un fascio di tipo line trace, che colpisce per tutta un linea
 	EBK_Spread   UMETA(DisplayName = "Spread"), // proiettili che si dirigono in varie direzioni
+	EBK_Speed    UMETA(DisplayName = "Speed"), // un proiettile normale di base più rapido
 	EBK_MAX      UMETA(DisplayName = "MAX")
 
 };

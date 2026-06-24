@@ -235,6 +235,7 @@ void APBullet::UpdateLoc(float DeltaTime)
 			Target = nullptr;
 			if (Timer > 0)Timer -= DeltaTime; else substate = 1;
 
+
 			FRotator ActualRot{ GetActorRotation() };
 			ActualRot.Pitch = FMath::FInterpConstantTo(ActualRot.Pitch,0,DeltaTime,40);
 			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
@@ -246,7 +247,7 @@ void APBullet::UpdateLoc(float DeltaTime)
 			case 1: // decide nemico da colpire
 			Target = GetCloseActiveEnemy();
 			substate = 2;
-			if (!Target) { substate = 0; Timer = 1.f;}
+			if (!Target) { substate = 0; Timer = 1.f; SetActorRotation(GetOwner()->GetActorRotation()); }
 
 			break;
 
@@ -262,7 +263,7 @@ void APBullet::UpdateLoc(float DeltaTime)
 					// trovo angolazione desiderata
 					FRotator NewRot((Target->GetActorLocation() - GetActorLocation()).Rotation());	
 					// ruoto ma lentamente
-					NewRot = FMath::RInterpConstantTo(GetActorRotation(), NewRot, DeltaTime,360);
+					NewRot = FMath::RInterpConstantTo(GetActorRotation(), NewRot, DeltaTime,700);
 					SetActorRotation(NewRot);
 					SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel*2);
 
@@ -270,7 +271,7 @@ void APBullet::UpdateLoc(float DeltaTime)
 					{ Target = nullptr; }
 
 
-			    } else substate = 1;
+			    } else substate = 1; // se improvvisamente il target non c'è più si torna allo stato 1
 
 			break;
 

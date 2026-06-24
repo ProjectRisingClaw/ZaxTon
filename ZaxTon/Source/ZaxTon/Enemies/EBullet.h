@@ -34,6 +34,9 @@ class ZAXTON_API AEBullet : public AActor
 
 	UNiagaraComponent* VfxComp{ nullptr };
 
+
+
+
 	float Wait{ 5.f }; // quando un proiettile deve stare fermo per un pò in una certa posizione
 
 	float Distance{ 500.f }; // quando devo misurare la distanza tra il proiettile e un punto di origine

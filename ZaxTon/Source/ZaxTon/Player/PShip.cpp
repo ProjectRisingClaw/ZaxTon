@@ -231,6 +231,8 @@ void APShip::Tick(float DeltaTime)
 	ManageMove(DeltaTime);
 	ManageFire(DeltaTime);
 
+	if (InUse.Num() <= 0) return;
+
 	for (int i = 0; i < InUse.Num(); i++)
 	{InUse[i]->UpdateLoc(DeltaTime);}
 
@@ -387,6 +389,23 @@ void APShip::SpecialBullet()
 	{
 		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
 		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(-50, -80, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		// nella locazione desiderata
+		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+	}
+
+
+	if (Available.Num() > 0) // se c'è almeno un elemento
+	{
+		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator(0, 30, 0), "SpecialBullet"); // attivo oggetto posizionandolo
+		// nella locazione desiderata
+		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
+	}
+
+	if (Available.Num() > 0) // se c'è almeno un elemento
+	{
+		auto NewBull{ Available.Pop() }; // tramite pop estraggo elemento dall'array
+		NewBull->Activate(SpawnLocation, GetActorRotation() + FRotator( 0, -30, 0), "SpecialBullet"); // attivo oggetto posizionandolo
 		// nella locazione desiderata
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
 	}

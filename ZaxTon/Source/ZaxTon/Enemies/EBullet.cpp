@@ -32,7 +32,8 @@ AEBullet::AEBullet()
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Collision);
-
+	Body->CastShadow      = false;
+	Body->bReceivesDecals = false;
 	// creazione componetne Niagara
 	VfxComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("VfxComp"));
 	VfxComp->SetupAttachment(Collision);
@@ -50,8 +51,9 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 
 	// controlla la riga della tabella e carica dati
 
-	UE_LOG(LogTemp,Error,TEXT("proiettile attivato = %s") , *AttackType.ToString())
+//	UE_LOG(LogTemp,Error,TEXT("proiettile attivato = %s") , *AttackType.ToString())
 
+	// attack type qui è il nome proiettile
 	FBulletTableRaw* MyRow{ MyDT->FindRow<FBulletTableRaw>(AttackType,TEXT("Context")) };
 
 	substate = 0; // reset di sotto stato 
@@ -112,12 +114,13 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		SetActorLocation(SpawnLocation);
 		SetActorRotation(SpawnRotation);
 		Durata = 5.f; // ripristino durata proiettile
-
 	
 		switch (BulletKind)
 		{
 		case EBulletKind::EBK_Normal:
-
+			VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
+			VfxComp->Activate();
+			VfxComp->ActivateSystem();
 		break;
 
 		case EBulletKind::EBK_Follow:
@@ -280,6 +283,7 @@ void AEBullet::UpdateLoc(float DeltaTime)
 		{	
 			Durata -= DeltaTime;
 			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
+			VfxComp->SetVariableVec3("EndPoint", GetActorLocation());
 		}
 		else DeActivate();
 

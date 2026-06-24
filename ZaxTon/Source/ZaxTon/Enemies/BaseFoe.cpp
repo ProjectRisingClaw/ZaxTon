@@ -32,7 +32,7 @@ ABaseFoe::ABaseFoe()
 
 	MyDT =  LoadObject<UDataTable>(nullptr, Path) ; // recupero la DT tramite Path
 	// vado a trovare la riga che mi interessa sulla DT
-	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(FName("NemicoA"),TEXT("Context")) };
+	FEnemyTableRaw* MyRow{ MyDT->FindRow<FEnemyTableRaw>(FName("Striker"),TEXT("Context")) };
 
 	// path dell'asset
 	if (MyRow->Mesh)
@@ -194,7 +194,7 @@ void ABaseFoe::WaveWait(float DeltaTime)
 
 			Customui1 -= 1;
 
-			Counter    = Customf3; // rimetto il contaatore alla dimensione del Dealy
+			Counter    = Customf3; // rimetto il contatore alla dimensione del Dealy
 		}
 
 	break; // sta fermo per un certo periodo (eventualmente spara)
@@ -308,7 +308,10 @@ void ABaseFoe::WaveBack(float DeltaTime)
 		FVector CamLocation{ MyCamera->GetActorLocation() }; // memorizzo loc camera
 		CamLocation.Z = GetActorLocation().Z;
 
+		// posizione precisa rispetto alla camera, dove si passa di stato
 		FVector Point{ (CamLocation + MyCamera->GetActorUpVector() * Customf2) };  // 400.f
+
+		//DrawDebugSphere(GetWorld(), Point, Customf1,32,FColor::Red);
 
 		double  Dist{ abs(Point.X - GetActorLocation().X) };
 
@@ -329,6 +332,14 @@ void ABaseFoe::WaveBack(float DeltaTime)
 			// memorizzo punto iniziale di rotazione e finale in radianti
 			CurrentLoopAngle = 0;
 			TargetLoopAngle = FMath::DegreesToRadians(Customf3);
+
+			if (Customui1 > 0) // primo attacco, prima del turn
+			{
+				FireBullet();
+				Customui1 -= 1;
+				
+			}
+
 		}
 
 	}
@@ -360,6 +371,9 @@ void ABaseFoe::WaveBack(float DeltaTime)
 				CurrentLoopAngle = TargetLoopAngle;
 				Vel *= 8; //aumento la velocità di 8 volte per tornare indietro rapidamente
 				SubState = 2;
+
+			
+
 			}
 		}
 		// gestione di cambio effettivo dell'orientamento
@@ -384,12 +398,23 @@ void ABaseFoe::WaveBack(float DeltaTime)
 		// per non fargli cambiare altezza
 		if (bCustomBool)
 		{
-			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel * 3);
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel);
 		}
 	}
 	break;
 
 	case 2:
+
+		if (Customui1  > 0) // secondo attacco dopo il turn in caso di altri proiettili
+		{
+			FireBullet();
+			Customui1 -= 1;	
+		}
+
+		SubState = 3;
+	break;
+
+	case 3:
 	{ SetActorLocation(GetActorLocation() + GetActorForwardVector() * DeltaTime * Vel); }
 	break; // riprende ad avanzare e successivamente esce dallo schermo
 
@@ -481,6 +506,8 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		Customf3    = MyRow->AngleAmp;
 		Customf4    = MyRow->RotationSpeed;
 
+		Customui1   = MyRow->BulletNumber; // numero di colpi da sparare se si hanno
+
 		bCustomBool = MyRow->bMoveWhileRotating;
 		break;
 
@@ -502,6 +529,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		case EBulletKind::EBK_Follow:   break;
 		case EBulletKind::EBK_Spiral:   break;
 		case EBulletKind::EBK_Spread: BulletName = "SpreadBullet"; break;
+		case EBulletKind::EBK_Speed:  BulletName = "SpeedBullet";  break;
 			//case EBulletKind::EBK_: BulletName = "SpreadBullet"; break;
 		}
 

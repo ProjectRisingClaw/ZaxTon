@@ -40,10 +40,10 @@ public:
 
 
 	UPROPERTY(EditAnyWhere, Category = "Spawn")
-	EEnemyType EnemyType{ EEnemyType::EET_NemicoA };
+	EEnemyType EnemyType{ EEnemyType::EET_Striker };
 
 
-	FName TipiNemici[10]{ "NemicoA","NemicoB","NemicoC","NemicoD","NemicoE","NemicoF","","","","" };
+	FName TipiNemici[10]{ "Striker","Eagle","Bomber","Ambush","Flip","Killer","Destroyer","XX","YY","ZZ" };
 
 
 	UFUNCTION()

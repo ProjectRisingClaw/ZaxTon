@@ -71,7 +71,7 @@ struct FEnemyTableRaw : public FTableRowBase
 	// a seconda del tipo di ondata i proiettili potrebbero essere 
 	//sparati in momenti differenti
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
-	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait", EditConditionHides))
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait || WaveMode ==  EWaveMode::EWM_Back ", EditConditionHides))
 	uint8 BulletNumber{ 0 };
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
@@ -79,7 +79,7 @@ struct FEnemyTableRaw : public FTableRowBase
 	float BulletDelay{ 0.2f }; // tempo che intercorre tra un proiettile e l'altro
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly,
-	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait || WaveMode ==  EWaveMode::EWM_Spin", EditConditionHides))
+	meta = (EditCondition = "WaveMode ==  EWaveMode::EWM_Wait || WaveMode ==  EWaveMode::EWM_Spin || WaveMode ==  EWaveMode::EWM_Back", EditConditionHides))
 	EBulletKind BulletKind{ EBulletKind::EBK_Normal };
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
