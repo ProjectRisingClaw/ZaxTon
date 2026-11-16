@@ -7,9 +7,15 @@ public class ZaxTonEditorTarget : TargetRules
 {
 	public ZaxTonEditorTarget( TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Editor;
+		/*Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_6;
-		ExtraModuleNames.Add("ZaxTon");
-	}
+		ExtraModuleNames.Add("ZaxTon");*/
+
+        Type = TargetType.Editor;
+        DefaultBuildSettings = BuildSettingsVersion.V7;
+        ExtraModuleNames.AddRange(new string[] { "ZaxTon" });
+
+
+    }
 }

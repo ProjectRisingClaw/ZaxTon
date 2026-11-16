@@ -7,9 +7,14 @@ public class ZaxTonTarget : TargetRules
 {
 	public ZaxTonTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Game;
+	/*	Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_6;
-		ExtraModuleNames.Add("ZaxTon");
-	}
+		ExtraModuleNames.Add("ZaxTon");*/
+
+        Type = TargetType.Game;
+        DefaultBuildSettings = BuildSettingsVersion.V7;
+        ExtraModuleNames.AddRange(new string[] { "ZaxTon" });
+
+    }
 }
