@@ -9,7 +9,7 @@ for %%d in (Intermediate Saved .vs Binaries DerivedDataCache Backup) do (
     )
 )
 
-for %%f in (*.sln .vsconfig *.htm) do (
+for %%f in (*.sln .vsconfig *.htm  *.slnx) do (
     if exist "%%f" (
         echo Eliminazione di %%f...
         del /q "%%f"
