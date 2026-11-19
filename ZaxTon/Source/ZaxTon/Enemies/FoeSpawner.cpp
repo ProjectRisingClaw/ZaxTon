@@ -24,8 +24,13 @@ AFoeSpawner::AFoeSpawner()
 
 }
 
+
+
 void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+
+	if (bBackAttack) return; // è un attacco da dietro, ignoro l'overlap iniziale
+
 	if (!MyGameMode) return;
 
 	if (!Cast<APCamera>(OtherActor)) return;
@@ -75,11 +80,59 @@ void AFoeSpawner::Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 }
 
+
+// spawn in caso di attacco dalle spalle
+void AFoeSpawner::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (!bBackAttack) return; // se non sono in back attack all'uscita non faccio alcuno spawn
+
+	if (!MyGameMode) return;
+
+	if (!Cast<APCamera>(OtherActor)) return;
+
+	for (int i = 0; i < NumFoe; i++)
+	{
+		if (MyGameMode->Available.Num() < 1) return;
+
+		ABaseFoe* ToSpawn{ MyGameMode->Available.Pop() };
+
+		if (ToSpawn)
+		{
+
+			// disposizioni iniziali per nemici particolari
+			switch (EnemyType)
+			{
+
+			case EEnemyType::EET_Killer: // il nemico killer spara e va in spawn in linea orizzontale
+			case EEnemyType::EET_Bomber:
+				ToSpawn->Activate(GetActorLocation() - GetActorRightVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
+				ToSpawn->SetVel(Vel);
+				break;
+
+			default:
+				ToSpawn->Activate(GetActorLocation() - GetActorForwardVector() * (Gap * i), GetActorRotation(), TipiNemici[uint8(EnemyType)]);
+				ToSpawn->SetVel(Vel);
+
+			}
+
+			MyGameMode->InUse.AddUnique(ToSpawn);
+
+		}
+	}
+
+
+
+}
+
+
+
+
 // Called when the game starts or when spawned
 void AFoeSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnPoint->OnComponentBeginOverlap.AddDynamic(this, &AFoeSpawner::Overlap);
+	SpawnPoint->OnComponentEndOverlap.AddDynamic(this, &AFoeSpawner::EndOverlap);
 	// memorizzo puntatore al mio game mode
 	MyGameMode = Cast<AZaxMode>(GetWorld()->GetAuthGameMode());
 }

@@ -12,12 +12,19 @@ void APCamera::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	// qui controllo che sia uscito dal Box della Camera, un nemico
 	// nel qaul caso, su di lui eseguo DeActivate
 	auto OutFoe{ Cast<ABaseFoe>(OtherActor) };
-
-
 	if (!OutFoe) return;
+
+	//UE_LOG(LogTemp, Error, TEXT("Exit %s"), *OutFoe->GetName());
+
 	if (!Cast<USphereComponent>(OtherComp)) return;
 
-	OutFoe->DeActivate();
+	// passando per questa funzione, il nemico
+	// prima di sparire, controllera a sua volta l'overlap con la camera
+
+	FTimerHandle DestroyTime;
+
+	GetWorldTimerManager().SetTimer(DestroyTime, OutFoe, &ABaseFoe::CanDeactivate, 0.1);
+	//OutFoe->CanDeactivate();
 
 }
 
@@ -61,6 +68,9 @@ void APCamera::BeginPlay()
 {
 	Super::BeginPlay();
 	TriggerBox->OnComponentEndOverlap.AddDynamic(this,&APCamera::EndOverlap);
+
+	// in teoria la camera è il primo oggetto a muoversi nello schermo
+	SetTickGroup(TG_PrePhysics);
 
 }
 

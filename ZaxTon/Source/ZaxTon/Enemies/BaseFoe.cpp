@@ -565,6 +565,16 @@ void ABaseFoe::SpawnDieEffect()
 }
 
 
+void ABaseFoe::CanDeactivate()
+{
+	if(!Collision->IsOverlappingActor(MyCamera)) DeActivate();
+	
+	//if (MyCamera)
+
+//	DeActivate();
+}
+
+
 void ABaseFoe::DeActivate()
 {
 	// nel caso del laser, quando il nemico si disattiva, si porta dietro il proiettile
@@ -605,6 +615,6 @@ void ABaseFoe::ResetMaterial()
 	if (StandardMaterial)
 	{
 		Body->SetMaterial(0, StandardMaterial);
-		UE_LOG(LogTemp, Error, TEXT("resetmat %s"), *StandardMaterial->GetName());
+		//UE_LOG(LogTemp, Error, TEXT("resetmat %s"), *StandardMaterial->GetName());
 	}
 }

@@ -110,6 +110,10 @@ public:
 	
 	void SpawnDieEffect();
 
+	// funzione di controllo su uscita dalla camera
+	// per risolvere bug di sincronizzazione
+	void CanDeactivate();
+
 
 protected:
 	// Called when the game starts or when spawned
