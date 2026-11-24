@@ -108,6 +108,11 @@ struct FPlayerTableRaw: public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UUserWidget> HUDWidgetClass;
 
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float FireRateMin{ 5.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float FireRateMax{ 10.f };
 };
 
 USTRUCT(BlueprintType)
@@ -125,6 +130,10 @@ struct FBulletTableRaw : public FTableRowBase
 	// effetto particellare per scia del proiettile
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (EditCondition = "BulletKind !=  EBulletKind::EBK_Spread", EditConditionHides))
 	UNiagaraSystem* MoveFX{ nullptr };
+
+	// Danni proiettile
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	uint8 Damage{ 1 };
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (EditCondition = "BulletKind !=  EBulletKind::EBK_Spread", EditConditionHides))
 	float Vel{ 1200.f };

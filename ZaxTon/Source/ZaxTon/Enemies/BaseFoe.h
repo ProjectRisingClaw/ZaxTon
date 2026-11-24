@@ -78,6 +78,7 @@ class ZAXTON_API ABaseFoe : public AActor
 
 	bool  bCustomBool{ false };
 
+	// Vita dei nemici
 	uint8 HitPoint{ 1 };
 
 	UMaterial* HitMaterial{ nullptr };
@@ -121,7 +122,7 @@ protected:
 
 public:	
 	
-	bool Hitted();
+	bool Hitted(uint8 PlayerDamage);
 
 	void UpdateLoc(float DeltaTime);
 
@@ -136,5 +137,4 @@ public:
 	void FireBullet();
 
 	void WaveBack(float DeltaTime);
-
 };

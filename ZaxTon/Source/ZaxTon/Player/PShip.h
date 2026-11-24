@@ -62,7 +62,11 @@ class ZAXTON_API APShip : public APawn
 
 	// vera se il fuco è attivo
 	bool  bFireOn{ false };
-	float FireRate{8.f}; // fire rte ovver oil numero di colpi al secondo 
+
+	float FireRate;			// fire rate ovver oil numero di colpi al secondo
+
+	float FireRateMin;
+	float FireRateMax;
 
 	float FireTime{ 0.f }; // variabile counter , in sostituzione di un eventuale timer di unreal
 
@@ -78,9 +82,9 @@ class ZAXTON_API APShip : public APawn
 	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
 	// mi serve un handle per poter spegnere il timer al momento del rilascio
 public:
-
 	
 	FORCEINLINE void AddPower(float ToAdd) { PowerUp = (PowerUp + ToAdd) > PowerMax ? PowerMax : PowerUp + ToAdd; };
+	//FORCEINLINE void AddFireRate(float ToAdd) { FireRate = (FireRate + ToAdd) <= FireRateMax ? FireRate + ToAdd : FireRateMax; };
 
 	UFUNCTION(BlueprintPure)
 	float GetPowerPercent(){ return (PowerUp / PowerMax); };
@@ -141,4 +145,7 @@ public:
 
 	void SpawnDieEffect();
 
+	FORCEINLINE float GetFireRateMin() { return FireRateMin; }
+	FORCEINLINE float GetFireRateMax() { return FireRateMax; }
+	FORCEINLINE float GetPowerMax() { return PowerMax; }
 };

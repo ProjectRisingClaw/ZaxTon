@@ -6,7 +6,7 @@
 #include "NiagaraFunctionLibrary.h" // per spawn di niagara system
 #include "ZaxTon/ZaxMode.h" 
 #include "ZaxTon/Effects/Explosion.h"
-#include "ZaxTon/Player/PCamera.h" 
+#include "ZaxTon/Player/PCamera.h"
 #include "EngineUtils.h"
 #include "EBullet.h"
 // Sets default values
@@ -49,7 +49,6 @@ ABaseFoe::ABaseFoe()
 		UE_LOG(LogTemp, Error, TEXT(" no mesh "));
 	}
 
-
 	
 }
 
@@ -61,11 +60,10 @@ void ABaseFoe::BeginPlay()
 	// memorizzo il pointer alla camera
 	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
 	{ MyCamera = *CamList; }
-
 }
 
 
-bool ABaseFoe::Hitted()
+bool ABaseFoe::Hitted(uint8 PlayerDamage)
 {
 	//UMaterialInstanceDynamic* Coso;
 	//Coso->Set
@@ -81,11 +79,12 @@ bool ABaseFoe::Hitted()
 
 		//FTimerHandle TempTimer;
 		GetWorldTimerManager().SetTimer(TempTimer, this, &ABaseFoe::ResetMaterial, 0.1f);
-		HitPoint--;
 
-		return false;
+		// Calcola la vita del nemico - il danno dei proiettili del giocatore
+		HitPoint -= PlayerDamage;
 	}
-	else
+
+	if (HitPoint <= 0)
 	{
 		SpawnDieEffect(); // effetto particellare esplosione
 		DeActivate();     // rimuovo nemico
@@ -93,6 +92,7 @@ bool ABaseFoe::Hitted()
 
 		return true;
 	}
+	else return false;
 }
 
 void ABaseFoe::UpdateLoc(float DeltaTime)

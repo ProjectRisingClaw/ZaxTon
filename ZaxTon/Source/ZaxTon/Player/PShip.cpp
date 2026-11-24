@@ -113,6 +113,9 @@ APShip::APShip()
 		//Body->SetStaticMesh(MyMesh);
 		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
 		Body->CastShadow = false;
+		FireRate = MyRow->FireRateMin;
+		FireRateMin = MyRow->FireRateMin;
+		FireRateMax = MyRow->FireRateMax;
 	}
 
 	//auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01.SM_StarSparrow01'"); // funziona ugualmente ma non più necessario
@@ -157,6 +160,10 @@ void APShip::BeginPlay()
 {
 	Super::BeginPlay();
 
+	auto Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
+
+	MyDT = LoadObject<UDataTable>(nullptr, Path);
+
 	FPlayerTableRaw* MyRow{ MyDT->FindRow<FPlayerTableRaw>(FName("PlayerA"),TEXT("Context")) };
 	
 	if (MyRow->HUDWidgetClass)
@@ -169,13 +176,17 @@ void APShip::BeginPlay()
 		}
 	}
 
-
 	// Verifica subito dopo
 	//UE_LOG(LogTemp, Warning, TEXT("Response dopo set: %d"),
 		//(int32)Collision->GetCollisionResponseToChannel(ECC_PLAYER_TRACE));
 	// il fire rate messo come vaolre iniziale si intende in 
 	// proiettil ial secondo. qui lo ricaloclolo come 1/ numero di proiettili
-	FireRate = 1 / FireRate;
+	//FireRate = 1 / FireRate;
+
+	FireRate = 1 / FireRateMin;
+
+	//FireRate = 1 / (FireRateMin + FireRateMax*GetPowerPercent());
+
 
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &APShip::ColpitoFromFOE);
 
@@ -249,7 +260,6 @@ void APShip::ManageFire(float DeltaTime)
 			FireTime = 0;
 			SpawnBullet();
 		}
-
 	}
 }
 
@@ -275,6 +285,7 @@ void APShip::SpawnBullet()
 	
 	}
 
+	FireRate = 1 / (FireRateMin + FireRateMax * GetPowerPercent());
 }
 
 
@@ -348,7 +359,19 @@ void APShip::SpecialBullet()
 {
 	if (PowerUp < PowerMax) return; // manca l'energia per l'attacco
 
-	PowerUp = 0; 
+	PowerUp = 0;
+
+
+	/*
+	auto Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
+
+	MyDT = LoadObject<UDataTable>(nullptr, Path);
+
+	FPlayerTableRaw* MyRow{ MyDT->FindRow<FPlayerTableRaw>(FName("PlayerA"),TEXT("Context")) };
+	*/
+	/*if (MyRow) {
+		FireRate = MyRow->FireRateMin;
+	}*/
 
 	FVector SpawnLocation{ GetActorLocation() + GetActorForwardVector() *20 }; // trovo posizione spawn
 	//classe  // riferimento uclass    // locazione   // rotazione di spawn
@@ -410,6 +433,8 @@ void APShip::SpecialBullet()
 		InUse.AddUnique(NewBull); // memorizzo l'indirizzo dell'istanza nella lista "in uso"
 	}
 
+
+	FireRate = 1 / (FireRateMin + FireRateMax * GetPowerPercent());	// Reset Fire Rate
 }
 
 

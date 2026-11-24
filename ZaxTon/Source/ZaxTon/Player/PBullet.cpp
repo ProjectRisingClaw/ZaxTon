@@ -85,7 +85,7 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		Vel = MyRow->Vel;
 		VfxComp->SetAsset(MyRow->MoveFX); // assegno al componente il particellare in loop
 		NSImpact = MyRow->ExplosionFX;
-	
+		Damage = MyRow->Damage;
 		//VfxImpact->SetAsset(MyRow->ExplosionFX); // effetto da passare all'actor delle esposioni
 	}
 
@@ -167,21 +167,20 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		Effect->Activate(GetActorLocation(), FRotator(0), NSImpact);
 	}
 	
-	bool IsDead{ Foe->Hitted() }; // informo il nemico di essere stato colpito, gestira lui rimozione HP
+	bool IsDead{ Foe->Hitted(Damage) }; // informo il nemico di essere stato colpito, gestira lui rimozione HP
 
 	if (IsDead) // se il nemico è morto incremento powerup sul giocatore
 	{
 		auto MyShip{ Cast<APShip>(GetOwner()) }; // controllo che Owner sia di tipo APShip
-		if (MyShip)MyShip->AddPower(2.f);
-
+		//if (MyShip)MyShip->AddPower(MyShip->GetPowerMax() / MyShip->GetPowerAndFireRate());
+		if (MyShip)MyShip->AddPower(2);
+		//if (MyShip)MyShip->AddFireRate((MyShip->GetFireRateMax() - MyShip->GetFireRateMin()) / MyShip->GetPowerAndFireRate());
 	}
 
 	//Foe->HitPoint 
 
 	VfxComp->DeactivateImmediate();
 	DeActivate();          // rimuovo me stesso
-
-
 }
 
 

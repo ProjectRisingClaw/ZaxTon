@@ -51,6 +51,9 @@ public:
 
 	float Timer{ 0.3f }; // timer generico multi purpose
 
+	// Danno del proiettile ai nemici
+	uint8 Damage{ 1 };
+
 	// attiva grafica e fisica del proiettile
 	// da richiamare qunado estratto dalla pool
 	void Activate(FVector SpawnLocation,FRotator SpawnRotation, FName AttackType = "NormalBullet");
