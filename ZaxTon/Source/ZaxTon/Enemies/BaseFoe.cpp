@@ -69,7 +69,9 @@ bool ABaseFoe::Hitted(uint8 PlayerDamage)
 	//Coso->Set
 	//Body->CreateDynamicMaterialInstance()
 
-	if (HitPoint > 1)
+	HitPoint -= PlayerDamage;
+
+	if (HitPoint >= 1)
 	{
 	    // Creo qui l'istanza dinamica di un materiale, partendo da un materiale statico
 		HitDynamic = Body->CreateDynamicMaterialInstance(0,HitMaterial);
@@ -81,7 +83,7 @@ bool ABaseFoe::Hitted(uint8 PlayerDamage)
 		GetWorldTimerManager().SetTimer(TempTimer, this, &ABaseFoe::ResetMaterial, 0.1f);
 
 		// Calcola la vita del nemico - il danno dei proiettili del giocatore
-		HitPoint -= PlayerDamage;
+		
 	}
 
 	if (HitPoint <= 0)
