@@ -14,6 +14,7 @@
 #include "ZaxTon/Enemies/EBullet.h"
 #include "ZaxTon/ZaxMode.h"
 #include "Kismet/GameplayStatics.h"  // libreria funzioni per il gameplay
+#include "../Enemies/Fuel.h"
 
 // funzione di init input
 static void InitDefaultKeys()
@@ -443,9 +444,13 @@ void APShip::ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 {
 	// nel caso di hit da corpo di un nemico o proiettile
 	// ricevo lo stesso danno 
-	if (Cast<ABaseFoe>(OtherActor) || Cast<AEBullet>(OtherActor)) 
+	if ((Cast<ABaseFoe>(OtherActor) || Cast<AEBullet>(OtherActor)) && !DPhase)
 	{ 	
 		HitGeneral();
+	}
+	else if (Cast<AFuel>(OtherActor)) {
+		AddPower(2.f);
+		Cast<AFuel>(OtherActor)->DeActivate();
 	}
 }
 
@@ -453,8 +458,9 @@ void APShip::HitGeneral()
 {
 	// per un overlap non è necessario ma siccome il trace prende anche oggetti in "no collsion"
 	// faccio in modo di uscire manualmente dalla gestione danni fin quando non ho ripristinato Query & Physics
-	if (Collision->GetCollisionEnabled() == ECollisionEnabled::NoCollision) return;
+	if (DPhase) return;
 
+	DPhase = true;
 	death = true;
 	SpawnDieEffect();
 
@@ -465,7 +471,7 @@ void APShip::HitGeneral()
 	//SetActorLocation(CamOffset);
 	//death = true;
 
-	Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	invs = true;
 	Body->SetHiddenInGame(invs);
 
@@ -491,7 +497,8 @@ void APShip::Respawn()
 		}
 		else {
 
-			Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			//Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			DPhase = false;
 			Body->SetHiddenInGame(false);
 			sec = 0;
 		}

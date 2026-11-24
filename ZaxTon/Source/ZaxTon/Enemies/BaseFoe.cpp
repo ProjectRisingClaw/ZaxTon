@@ -7,6 +7,7 @@
 #include "ZaxTon/ZaxMode.h" 
 #include "ZaxTon/Effects/Explosion.h"
 #include "ZaxTon/Player/PCamera.h"
+#include "Fuel.h"
 #include "EngineUtils.h"
 #include "EBullet.h"
 // Sets default values
@@ -563,6 +564,13 @@ void ABaseFoe::SpawnDieEffect()
 		auto NewEffect{ MyGM->AvailableEffects.Pop() };
 		if (!NewEffect) return;
 		NewEffect->Activate(GetActorLocation(),FRotator(0),ExplosionEffect);
+
+		if (MyGM->AvailableFuel.Num() > 0)
+		{
+			auto NewFuel{ MyGM->AvailableFuel.Pop() };
+			if (!NewFuel) return;
+			NewFuel->Activate(GetActorLocation());
+		}
 	}
 }
 
@@ -605,10 +613,14 @@ void ABaseFoe::DeActivate()
 		MyGM->Available.AddUnique(this);
 
 		
+
+		
 	}
 
 	// se sto tra quelli in uso, mi rimuovo dalla lista
 	ResetMaterial();
+
+
 }
 
 

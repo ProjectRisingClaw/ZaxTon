@@ -169,13 +169,13 @@ void APBullet::HitEnemy(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	
 	bool IsDead{ Foe->Hitted(Damage) }; // informo il nemico di essere stato colpito, gestira lui rimozione HP
 
-	if (IsDead) // se il nemico è morto incremento powerup sul giocatore
+	/*if (IsDead) // se il nemico è morto incremento powerup sul giocatore
 	{
 		auto MyShip{ Cast<APShip>(GetOwner()) }; // controllo che Owner sia di tipo APShip
 		//if (MyShip)MyShip->AddPower(MyShip->GetPowerMax() / MyShip->GetPowerAndFireRate());
 		if (MyShip)MyShip->AddPower(2);
 		//if (MyShip)MyShip->AddFireRate((MyShip->GetFireRateMax() - MyShip->GetFireRateMin()) / MyShip->GetPowerAndFireRate());
-	}
+	}*/
 
 	//Foe->HitPoint 
 

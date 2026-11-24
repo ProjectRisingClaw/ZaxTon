@@ -11,6 +11,7 @@ class ABaseFoe;
 class AExplosion;
 class APCamera;
 class AEBullet;
+class AFuel;
 
 UCLASS()
 class ZAXTON_API AZaxMode : public AGameMode
@@ -30,6 +31,10 @@ public:
 	//virtual void StartPlay() override;
 	// array per actor con Niagaracomponent.
 	TArray<AExplosion*> AvailableEffects;
+
+    TArray<AFuel*> InUseFuel;
+    TArray<AFuel*> AvailableFuel;
+
 
     TArray<AEBullet*> AvailableEBullet; // proiettili disponibili per i nemici
     TArray<AEBullet*> InUseEBullet;     // proiettili dei nemici in uso

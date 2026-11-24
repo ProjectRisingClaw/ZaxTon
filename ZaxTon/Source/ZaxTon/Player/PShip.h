@@ -32,6 +32,9 @@ class ZAXTON_API APShip : public APawn
 	USphereComponent* Collision{ nullptr };
 
 	UNiagaraSystem* ExplosionEffect{ nullptr };
+		
+	//Fase morto
+	bool DPhase{ false };
 
 	UDataTable* MyDT{ nullptr };
 

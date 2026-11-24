@@ -4,6 +4,7 @@
 #include "ZaxMode.h"
 #include "Enemies/BaseFoe.h"
 #include "Effects/Explosion.h"
+#include "Enemies/Fuel.h"
 #include "Player/PCamera.h"
 #include "EngineUtils.h" // per iteratore
 #include "ZaxTon/Enemies/EBullet.h"
@@ -52,6 +53,17 @@ void AZaxMode::BeginPlay()
 			Effect->DeActivate(); 
 			//AvailableEffects.AddUnique(Effect);
 		    //UE_LOG(LogTemp, Error, TEXT("Av Effects %i"), AvailableEffects.Num());
+		}
+
+		AFuel* Benzina{ GetWorld()->SpawnActor<AFuel>(AFuel::StaticClass()) };
+
+		if (Benzina) {
+
+			//UE_LOG(LogTemp, Display, TEXT("Ciaoo!"));
+
+			Benzina->SetOwner(this);
+			Benzina->MyGM = this;
+			Benzina->DeActivate();
 		}
 	}
 
