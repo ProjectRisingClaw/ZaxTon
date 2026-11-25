@@ -94,6 +94,7 @@ class ZAXTON_API ABaseFoe : public AActor
 	// memorizzo in questo pointer l'ultimo proiettile sparato
 	AEBullet* LastBullet{ nullptr };
 
+	int BaseScore;
 public:	
 
 	FORCEINLINE void SetCustom3(float NewVal) { Customf3 = NewVal; };

@@ -83,5 +83,10 @@ void AZaxMode::Tick(float DeltaTime)
 		InUseEBullet[i]->UpdateLoc(DeltaTime);
 	}
 
+	if (MultiplyScore > 1) {
+		TimerMultiply += DeltaTime;
+
+		if (TimerMultiply >= 0.5) MultiplyScore = 1;
+	}
 }
 

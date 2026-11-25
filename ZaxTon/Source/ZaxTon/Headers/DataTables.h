@@ -88,6 +88,8 @@ struct FEnemyTableRaw : public FTableRowBase
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	UMaterial* HitMaterial{ nullptr };
 
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	int BaseScore{ 100 };
 };
 
 USTRUCT(BlueprintType)

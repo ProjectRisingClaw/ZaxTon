@@ -91,7 +91,13 @@ bool ABaseFoe::Hitted(uint8 PlayerDamage)
 		SpawnDieEffect(); // effetto particellare esplosione
 		DeActivate();     // rimuovo nemico
 
+		MyGM->PlayerScore += MyGM->MultiplyScore * BaseScore;
 
+		MyGM->TimerMultiply = 0.f;
+
+		if (MyGM->MultiplyScore < MyGM->MaxMultiplyScore) MyGM->MultiplyScore++;
+
+		//UE_LOG(LogTemp, Error, TEXT("PlayerScore: %i"), MyGM->PlayerScore);
 		return true;
 	}
 	else return false;
@@ -469,6 +475,7 @@ void ABaseFoe::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName New
 		WaveMode        =   MyRow->WaveMode;
 		HitPoint        =   MyRow->HitPoint; // memorizzo i colpi che si possono subire
 		HitMaterial     =   MyRow->HitMaterial;
+		BaseScore		=	MyRow->BaseScore;
 
 		StandardMaterial = Cast<UMaterial>(MyRow->Mesh->GetMaterial(0));
 		ResetMaterial();

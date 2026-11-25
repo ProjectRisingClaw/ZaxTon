@@ -477,6 +477,7 @@ void APShip::HitGeneral()
  // questa funzione alterna visibile e non visibile per 20 volte
 void APShip::Respawn()
 {
+	MyGM->MultiplyScore = 1;
 
 	if (numVit > 0)
 	{

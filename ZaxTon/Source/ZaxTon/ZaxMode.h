@@ -72,5 +72,13 @@ public:
 
     APCamera* MyCamera;
 
- 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    int PlayerScore{ 0 };
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    int MultiplyScore{ 1 };
+
+    int MaxMultiplyScore{ 10 };
+
+    float TimerMultiply{ 0.f };
 };
