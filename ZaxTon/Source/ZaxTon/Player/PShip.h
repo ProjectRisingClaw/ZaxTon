@@ -19,6 +19,9 @@ class ZAXTON_API APShip : public APawn
 {
 	GENERATED_BODY()
 
+	UPROPERTY(VisibleAnyWhere)
+	USphereComponent* Collision{ nullptr };
+
 	// puntatori vuoti per i componenti da aggiungere
 	// un solo putatore creato non vuol dire
 	// avere il componente, è solo il contenitore
@@ -27,12 +30,13 @@ class ZAXTON_API APShip : public APawn
 	UStaticMeshComponent*    Body{ nullptr };
 	//UStaticMeshComponent* Body = nullptr;
 
-
 	UPROPERTY(VisibleAnyWhere)
-	USphereComponent* Collision{ nullptr };
+	UStaticMeshComponent* ShieldMesh{ nullptr };
+	UMaterial* ShieldMaterial{ nullptr };
+	UMaterialInstanceDynamic* ShieldDynamic{ nullptr };
 
 	UNiagaraSystem* ExplosionEffect{ nullptr };
-		
+	
 	//Fase morto
 	bool DPhase{ false };
 
@@ -52,6 +56,7 @@ class ZAXTON_API APShip : public APawn
 	float front{ 0 };
 
 	FTimerHandle FtimerHandleRespawn;
+	FTimerHandle FtimerHandleShield;
 
 	UPROPERTY(EditAnyWhere)
 	float Vel{ 1200.f }; // velocità della nave
@@ -94,6 +99,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FLinearColor GetBarColor();
+
+	UFUNCTION()
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	// valore che deve aumentare se si distruggono nemici/ a 10 si può sparare l'attacco caricato
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	
@@ -138,6 +146,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SpecialBullet();
+
+	void SpecialShield();
+
+	void ShielOFF();
 
 	UFUNCTION()
 	void ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

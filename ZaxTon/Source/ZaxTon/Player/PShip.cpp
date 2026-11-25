@@ -39,11 +39,15 @@ static void InitDefaultKeys()
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Fire", EKeys::Gamepad_FaceButton_Bottom));
 
 
-	// tasto per l'attacco speciale (soloa ad energia massima)
+	// tasto per l'attacco speciale (solo ad energia massima)
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::RightMouseButton));
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::LeftShift));
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::Gamepad_LeftTrigger));
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::Gamepad_RightTrigger));
+
+	// Tasto scudo speciale
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("SpecialShield", EKeys::MiddleMouseButton));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Special", EKeys::Gamepad_FaceButton_Top));
 }
 
 FLinearColor APShip::GetBarColor()
@@ -63,6 +67,18 @@ FLinearColor APShip::GetBarColor()
 		return FLinearColor::MakeFromHSV8(uint8(ValueHsv), 254, 254);
 	}
 	else return FLinearColor(0,0.2f,1.f,1.f);
+}
+
+void APShip::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Error, TEXT("SUCA SPECIALE"));
+
+
+	if (Cast<AEBullet>(OtherActor)) {
+		AEBullet* EnemyBullet{ Cast<AEBullet>(OtherActor) };
+
+		EnemyBullet->DeActivate();
+	}
 }
 
 // Sets default values
@@ -95,7 +111,26 @@ APShip::APShip()
 	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Body->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	auto Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
+	auto Path = TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'");
+
+	auto MyShieldMesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),  // tipo dell'oggetto da trovare
+		nullptr,                                  // riferimeto ad oggetto se serve
+		Path));
+
+	if (MyShieldMesh) {
+		ShieldMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Shield Mesh"));
+		ShieldMesh->SetupAttachment(Collision);
+		ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ShieldMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+		ShieldMesh->SetHiddenInGame(true);
+		ShieldMesh->SetStaticMesh(MyShieldMesh);
+		ShieldMesh->SetRelativeScale3D(FVector(3.5f));
+		ShieldMesh->CastShadow = false;
+	}
+
+	ShieldMesh->OnComponentBeginOverlap.AddDynamic(this, &APShip::OverlapBegin);
+
+	Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
 
 	MyDT = LoadObject<UDataTable>(nullptr, Path);
 
@@ -117,6 +152,8 @@ APShip::APShip()
 		FireRate = MyRow->FireRateMin;
 		FireRateMin = MyRow->FireRateMin;
 		FireRateMax = MyRow->FireRateMax;
+		ShieldMaterial = MyRow->ShieldMaterial;
+		ShieldMesh->SetMaterial(0, ShieldMaterial);
 	}
 
 	//auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01.SM_StarSparrow01'"); // funziona ugualmente ma non più necessario
@@ -150,8 +187,6 @@ APShip::APShip()
 	{
 		UE_LOG(LogTemp, Error, TEXT(" no mesh "));
 	}*/
-
-	
 	
 	
 }
@@ -353,6 +388,7 @@ void APShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	InputComponent->BindAction("Fire", EInputEvent::IE_Released, this, &APShip::FireBulletRelease);
 	//GetWorld()->SpawnActor<APBullet>(APBullet::StaticClass(),,)
 	InputComponent->BindAction("Special", EInputEvent::IE_Pressed, this, &APShip::SpecialBullet);
+	InputComponent->BindAction("SpecialShield", EInputEvent::IE_Pressed, this, &APShip::SpecialShield);
 }
 
 
@@ -438,6 +474,32 @@ void APShip::SpecialBullet()
 	FireRate = 1 / (FireRateMin + FireRateMax * GetPowerPercent());	// Reset Fire Rate
 }
 
+void APShip::SpecialShield()
+{
+	//UE_LOG(LogTemp, Error, TEXT("SUCA"));
+
+	if (PowerUp < PowerMax) return; // manca l'energia per l'attacco
+
+	PowerUp = 0;
+
+	ShieldMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	ShieldMesh->SetCollisionResponseToAllChannels(ECR_Block);
+	ShieldMesh->SetHiddenInGame(false);
+
+	GetWorld()->GetTimerManager().SetTimer(FtimerHandleShield, this, &APShip::ShielOFF, 1, false);
+
+	
+}
+
+void APShip::ShielOFF()
+{
+
+	ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ShieldMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	ShieldMesh->SetHiddenInGame(true);
+
+}
+
 
 
 void APShip::ColpitoFromFOE(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -476,6 +538,8 @@ void APShip::HitGeneral()
 	Body->SetHiddenInGame(invs);
 
 	GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn, this, &APShip::Respawn, 0.5);
+
+	
 
 }
 

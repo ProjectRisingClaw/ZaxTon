@@ -104,6 +104,9 @@ struct FPlayerTableRaw: public FTableRowBase
 	UNiagaraSystem* ExplosionFX{ nullptr };
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	UMaterial* ShieldMaterial{ nullptr };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	float Vel{ 1200.f };
 
 	// Istanza runtime del widget
