@@ -18,6 +18,8 @@ AFuel::AFuel()
 	// deve vedere il giocatore come overlap
 	Body->SetCollisionResponseToChannel(ECC_PLAYER_OBJ, ECR_Overlap);
 
+	Body->CastShadow = false;
+
 	DirezioneX = FMath::RandRange(-1000.f, 1000.f);
 	DirezioneY = FMath::RandRange(-1000.f, 1000.f);
 

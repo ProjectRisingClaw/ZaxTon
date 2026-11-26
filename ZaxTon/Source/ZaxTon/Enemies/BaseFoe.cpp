@@ -72,6 +72,11 @@ bool ABaseFoe::Hitted(uint8 PlayerDamage)
 
 	HitPoint -= PlayerDamage;
 
+	//UE_LOG(LogTemp, Error, TEXT("Damage: %i"), PlayerDamage);
+	//UE_LOG(LogTemp, Error, TEXT("Vita: %i"), HitPoint);
+
+	if (HitPoint > 200) HitPoint = 0;
+
 	if (HitPoint >= 1)
 	{
 	    // Creo qui l'istanza dinamica di un materiale, partendo da un materiale statico

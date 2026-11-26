@@ -87,6 +87,10 @@ class ZAXTON_API APShip : public APawn
 
 	float PowerUp{ 0.f };
 	float PowerMax{ 10.f };
+
+	bool ShieldAnim{ false };
+	float OpacityShield{ 0.f };
+
 	//FTimerHandle FireHandle; // nel caso in cui io desideri usare un timer per il fire rate
 	// mi serve un handle per poter spegnere il timer al momento del rilascio
 public:
@@ -101,7 +105,7 @@ public:
 	FLinearColor GetBarColor();
 
 	UFUNCTION()
-	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OverlapShield(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	// valore che deve aumentare se si distruggono nemici/ a 10 si può sparare l'attacco caricato
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	

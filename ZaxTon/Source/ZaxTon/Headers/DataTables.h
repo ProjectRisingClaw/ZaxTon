@@ -118,6 +118,9 @@ struct FPlayerTableRaw: public FTableRowBase
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	float FireRateMax{ 10.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float AddPowerShield{ 1.f };
 };
 
 USTRUCT(BlueprintType)

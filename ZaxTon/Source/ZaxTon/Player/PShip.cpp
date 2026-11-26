@@ -69,13 +69,20 @@ FLinearColor APShip::GetBarColor()
 	else return FLinearColor(0,0.2f,1.f,1.f);
 }
 
-void APShip::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APShip::OverlapShield(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Error, TEXT("SUCA SPECIALE"));
-
+	//UE_LOG(LogTemp, Error, TEXT("SUCA SPECIALE"));
 
 	if (Cast<AEBullet>(OtherActor)) {
 		AEBullet* EnemyBullet{ Cast<AEBullet>(OtherActor) };
+
+		auto Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
+
+		MyDT = LoadObject<UDataTable>(nullptr, Path);
+
+		FPlayerTableRaw* MyRow{ MyDT->FindRow<FPlayerTableRaw>(FName("PlayerA"),TEXT("Context")) };
+
+		if (MyRow) AddPower(MyRow->AddPowerShield);
 
 		EnemyBullet->DeActivate();
 	}
@@ -122,13 +129,13 @@ APShip::APShip()
 		ShieldMesh->SetupAttachment(Collision);
 		ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		ShieldMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-		ShieldMesh->SetHiddenInGame(true);
+		//ShieldMesh->SetHiddenInGame(true);
 		ShieldMesh->SetStaticMesh(MyShieldMesh);
-		ShieldMesh->SetRelativeScale3D(FVector(3.5f));
+		ShieldMesh->SetRelativeScale3D(FVector(4.f));
 		ShieldMesh->CastShadow = false;
 	}
 
-	ShieldMesh->OnComponentBeginOverlap.AddDynamic(this, &APShip::OverlapBegin);
+	ShieldMesh->OnComponentBeginOverlap.AddDynamic(this, &APShip::OverlapShield);
 
 	Path = TEXT("/Game/DataTables/BPPlayerTable.BPPlayerTable");
 
@@ -152,8 +159,10 @@ APShip::APShip()
 		FireRate = MyRow->FireRateMin;
 		FireRateMin = MyRow->FireRateMin;
 		FireRateMax = MyRow->FireRateMax;
-		ShieldMaterial = MyRow->ShieldMaterial;
-		ShieldMesh->SetMaterial(0, ShieldMaterial);
+		//ShieldMaterial = MyRow->ShieldMaterial;
+		ShieldDynamic = ShieldMesh->CreateDynamicMaterialInstance(0, MyRow->ShieldMaterial);
+		ShieldMesh->SetMaterial(0, ShieldDynamic);
+		ShieldDynamic->SetScalarParameterValue("Opacity", OpacityShield);
 	}
 
 	//auto Path = TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow01.SM_StarSparrow01'"); // funziona ugualmente ma non più necessario
@@ -246,9 +255,6 @@ void APShip::BeginPlay()
 		bull->MyGM = MyGM;  // passo al bullet riferimento al game mode.
 	}
 
-
-
-
 	for (TActorIterator<APCamera> CamList(GetWorld()); CamList; ++CamList)
 	{
 		MyCamera = *CamList;
@@ -275,6 +281,26 @@ void APShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (ShieldAnim) {
+		if (OpacityShield < 0.8f) {
+			OpacityShield += DeltaTime * 2.5f;
+		}
+		else {
+			OpacityShield = 0.8f;
+		}
+	}
+	else {
+		if (OpacityShield > 0.f) {
+			OpacityShield -= DeltaTime * 2.5f;
+		}
+		else {
+			OpacityShield = 0.f;
+		}
+	}
+
+	//UE_LOG(LogTemp, Error, TEXT("Opacity: %f"), OpacityShield);
+	ShieldDynamic->SetScalarParameterValue("Opacity", OpacityShield);
+
 	ManageMove(DeltaTime);
 	ManageFire(DeltaTime);
 
@@ -282,7 +308,6 @@ void APShip::Tick(float DeltaTime)
 
 	for (int i = 0; i < InUse.Num(); i++)
 	{InUse[i]->UpdateLoc(DeltaTime);}
-
 }
 
 void APShip::ManageFire(float DeltaTime)
@@ -484,20 +509,18 @@ void APShip::SpecialShield()
 
 	ShieldMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	ShieldMesh->SetCollisionResponseToAllChannels(ECR_Block);
-	ShieldMesh->SetHiddenInGame(false);
+
+	ShieldAnim = true;
 
 	GetWorld()->GetTimerManager().SetTimer(FtimerHandleShield, this, &APShip::ShielOFF, 1, false);
-
-	
 }
 
 void APShip::ShielOFF()
 {
+	ShieldAnim = false;
 
 	ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ShieldMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	ShieldMesh->SetHiddenInGame(true);
-
 }
 
 
