@@ -34,7 +34,7 @@ void AFuel::BeginPlay()
 	auto MyMesh = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), nullptr, Path));
 	Body->SetStaticMesh(MyMesh);
 	SetActorRotation(FRotator(0, -90.f, 90.f));
-	SetActorScale3D(FVector(.6));
+	SetActorScale3D(FVector(0.6f));
 }
 
 // Called every frame

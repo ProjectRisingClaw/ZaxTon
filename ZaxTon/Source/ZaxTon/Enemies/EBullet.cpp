@@ -10,10 +10,10 @@
 // gestione particellari
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
-
-
 #include "ZaxTon/Player/PCamera.h"
 #include "EngineUtils.h"
+#include "ZaxTon/ZaxTon.h"
+
 
 AEBullet::AEBullet()
 {
@@ -22,7 +22,7 @@ AEBullet::AEBullet()
 
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	Collision->SetSphereRadius(26);
-	Collision->SetHiddenInGame(true);
+	Collision->SetHiddenInGame(!SHOW_COLLISION);
 	// tipo di obj per il proiettile
 	Collision->SetCollisionObjectType(ECC_ENEMY_OBJ);
 	// deve vedere il giocatore come overlap
@@ -73,6 +73,7 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		Distance = MyRow->Distance;
 		Wait     = MyRow->Wait;
 
+		Collision->SetSphereRadius(MyRow->CollisionRadius);
 	}
 
 	// disattivo collisione proiettile 
@@ -109,7 +110,7 @@ void AEBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 		//Collision->SetCollisionObjectType(ECC_ENEMY_OBJ);
 		//PrimaryActorTick.bCanEverTick = true;
 		// nascondo grafica del proiettile
-		Body->SetHiddenInGame(false);
+		Body->SetHiddenInGame(!SHOW_COLLISION);
 		// posiziono l'ogggetto in una zona lontana da quella di azione
 		SetActorLocation(SpawnLocation);
 		SetActorRotation(SpawnRotation);

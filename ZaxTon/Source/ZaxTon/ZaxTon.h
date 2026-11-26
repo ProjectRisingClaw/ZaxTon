@@ -4,3 +4,6 @@
 
 #include "CoreMinimal.h"
 
+
+// debug stuff
+#define SHOW_COLLISION false

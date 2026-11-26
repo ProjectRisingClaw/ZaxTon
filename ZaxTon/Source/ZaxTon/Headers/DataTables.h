@@ -90,6 +90,13 @@ struct FEnemyTableRaw : public FTableRowBase
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	int BaseScore{ 100 };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float CollisionRadius{ 54.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Scale{ 0.2f };
+
 };
 
 USTRUCT(BlueprintType)
@@ -121,6 +128,13 @@ struct FPlayerTableRaw: public FTableRowBase
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	float AddPowerShield{ 1.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float CollisionRadius{ 54.f };
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float Scale{ 0.2f };
+
 };
 
 USTRUCT(BlueprintType)
@@ -170,5 +184,7 @@ struct FBulletTableRaw : public FTableRowBase
 	float Distance{ 500.f };
 
 
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float CollisionRadius{ 20.f };
 
 };

@@ -12,7 +12,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Kismet/KismetMathLibrary.h"
-
+#include "ZaxTon/ZaxTon.h"
 
 // Sets default values
 APBullet::APBullet()
@@ -22,7 +22,7 @@ APBullet::APBullet()
 
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	Collision->SetSphereRadius(26);
-	Collision->SetHiddenInGame(true);
+	Collision->SetHiddenInGame(!SHOW_COLLISION);
 
 	SetRootComponent(Collision);
 
@@ -81,11 +81,13 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 	{
 
 		Body->SetStaticMesh(MyRow->Mesh);
-		Body->SetRelativeScale3D(FVector(MyRow->Scale));
-		Vel = MyRow->Vel;
+		Body->SetRelativeScale3D(FVector(MyRow->Scale));	
 		VfxComp->SetAsset(MyRow->MoveFX); // assegno al componente il particellare in loop
+
 		NSImpact = MyRow->ExplosionFX;
-		Damage = MyRow->Damage;
+		Damage   = MyRow->Damage;
+		Vel = MyRow->Vel;
+		Collision->SetSphereRadius(MyRow->CollisionRadius);
 		//VfxImpact->SetAsset(MyRow->ExplosionFX); // effetto da passare all'actor delle esposioni
 	}
 
@@ -96,6 +98,7 @@ void APBullet::Activate(FVector SpawnLocation, FRotator SpawnRotation, FName Att
 
 	//PrimaryActorTick.bCanEverTick = true;
 	// nascondo grafica del proiettile
+	//Collision->SetHiddenInGame(!SHOW_COLLISION);
 	Body->SetHiddenInGame(false);
 	// posiziono l'ogggetto in una zona lontana da quella di azione
 	SetActorLocation(SpawnLocation);

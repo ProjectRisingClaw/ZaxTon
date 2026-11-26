@@ -10,6 +10,8 @@
 #include "Fuel.h"
 #include "EngineUtils.h"
 #include "EBullet.h"
+#include "ZaxTon/ZaxTon.h"
+
 // Sets default values
 ABaseFoe::ABaseFoe()
 {
@@ -22,7 +24,7 @@ ABaseFoe::ABaseFoe()
 	Collision->SetCollisionObjectType(ECC_ENEMY_OBJ);
 	// deve vedere il giocatore come overlap
 	Collision->SetCollisionResponseToChannel(ECC_PLAYER_OBJ, ECR_Overlap);
-
+	Collision->SetHiddenInGame(!SHOW_COLLISION);
 	SetRootComponent(Collision);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
@@ -38,10 +40,10 @@ ABaseFoe::ABaseFoe()
 	// path dell'asset
 	if (MyRow->Mesh)
 	{
-		Collision->SetSphereRadius(64);
-		Collision->SetHiddenInGame(true);
+		Collision->SetSphereRadius(MyRow->CollisionRadius);
+		Collision->SetHiddenInGame(!SHOW_COLLISION);
 		Body->SetStaticMesh(MyRow->Mesh);
-		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+		Body->SetRelativeScale3D(FVector(MyRow->Scale));
 		Body->CastShadow = false;
 
 	}

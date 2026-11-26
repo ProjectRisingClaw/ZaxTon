@@ -14,7 +14,9 @@
 #include "ZaxTon/Enemies/EBullet.h"
 #include "ZaxTon/ZaxMode.h"
 #include "Kismet/GameplayStatics.h"  // libreria funzioni per il gameplay
-#include "../Enemies/Fuel.h"
+#include "ZaxTon/Enemies/Fuel.h"
+#include "ZaxTon/ZaxTon.h"
+
 
 // funzione di init input
 static void InitDefaultKeys()
@@ -151,12 +153,12 @@ APShip::APShip()
 		Body->SetStaticMesh(MyRow->Mesh);     // copio valore della mesh da DT
 		ExplosionEffect = MyRow->ExplosionFX;
 		Vel             = MyRow->Vel;
-		Collision->SetSphereRadius(64);
-		Collision->SetHiddenInGame(true);
+		Collision->SetSphereRadius(MyRow->CollisionRadius);
+		Collision->SetHiddenInGame(!SHOW_COLLISION);
 		//Body->SetStaticMesh(MyMesh);
-		Body->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+		Body->SetRelativeScale3D(FVector(MyRow->Scale));
 		Body->CastShadow = false;
-		FireRate = MyRow->FireRateMin;
+		FireRate    = MyRow->FireRateMin;
 		FireRateMin = MyRow->FireRateMin;
 		FireRateMax = MyRow->FireRateMax;
 		//ShieldMaterial = MyRow->ShieldMaterial;
@@ -371,6 +373,30 @@ void APShip::ManageMove(float DeltaTime)
 	FVector Direction{ front,left,0 };
 	Direction.Normalize(); // normalizzo il vettore portandol oa dimensione 1
 
+
+	
+	if (left < -0.05)
+	{
+		//if (MyRoll > -30) MyRoll -= 60 * DeltaTime;
+		MyRoll = FMath::FInterpTo(MyRoll, -30, DeltaTime, 20);
+	}
+	else if (left > 0.05)
+	{
+		//if (MyRoll < 30) MyRoll += 60 * DeltaTime;
+		MyRoll = FMath::FInterpTo(MyRoll, 30, DeltaTime, 20);
+	}
+	else
+	{
+		MyRoll = FMath::FInterpTo(MyRoll, 0, DeltaTime, 20);
+
+
+	}
+
+	FRotator Rot = GetActorRotation();
+	Rot.Roll     = MyRoll;
+	SetActorRotation(Rot);
+
+
 	// non baso più la posizione della nave su la propria locazione 
 	//+  (Direction * Vel * DeltaTime), ma utilizzo questi valori
 	// per modificare lo scarto tra ca,era e nave
@@ -581,7 +607,7 @@ void APShip::Respawn()
 
 		if (sec < 20) {
 
-			GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn, this, &APShip::Respawn, 0.1);
+			GetWorld()->GetTimerManager().SetTimer(FtimerHandleRespawn, this, &APShip::Respawn, 0.1f);
 		}
 		else {
 

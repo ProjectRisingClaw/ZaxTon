@@ -40,6 +40,8 @@ class ZAXTON_API APShip : public APawn
 	//Fase morto
 	bool DPhase{ false };
 
+	float MyRoll{ 0 };
+
 	UDataTable* MyDT{ nullptr };
 
 	// funzioni gestione movimento
